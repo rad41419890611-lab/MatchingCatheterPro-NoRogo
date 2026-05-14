@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<title>Matching Catheter Pro</title>
+<style>
+:root{--bg:#0a0e14;--s1:#111720;--s2:#192030;--s3:#1a2535;--b1:#1e2d3d;--b2:#2a4060;--ac:#00d4ff;--ok:#4fffb0;--ng:#ff4d6d;--wn:#ff9f1c;--tx:#e2eaf5;--mu:#5a7a9a;--r:6px;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html{-webkit-text-size-adjust:100%;}
+html,body{background-color:#0a0e14!important;color:#e2eaf5!important;min-height:100%;}
+body{font-family:'Hiragino Sans','Noto Sans JP',sans-serif;background-image:linear-gradient(rgba(0,212,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,.04) 1px,transparent 1px);background-size:40px 40px;-webkit-overflow-scrolling:touch;}
+
+#pgLogin{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px 16px 40px;background-color:#0a0e14;gap:10px;}
+#pgTx,#pgMain{display:none;background-color:#0a0e14;min-height:100vh;}
+#pgTx{flex-direction:column;align-items:center;padding:32px 16px 48px;}
+#pgMain{padding:12px 14px 60px;}
+
+.splash{position:fixed;inset:0;z-index:12000;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 30%,rgba(0,212,255,.18),transparent 36%),linear-gradient(180deg,#0d1420 0%,#0a0e14 100%);transition:opacity .55s ease,visibility .55s ease;}
+.splash.hide{opacity:0;visibility:hidden;}
+.splashCore{display:flex;flex-direction:column;align-items:center;gap:14px;padding:24px;transform:translateY(-8px);animation:splashFloat 1.5s ease-in-out infinite alternate;}
+@keyframes splashFloat{from{transform:translateY(-6px);}to{transform:translateY(6px);}}
+.brandStack{display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:12px;}
+.brandLogoCard{display:none;align-items:center;justify-content:center;background:linear-gradient(180deg,#ffffff 0%,#eef6ff 100%);border:1px solid rgba(255,255,255,.18);border-radius:22px;padding:14px 20px;box-shadow:0 16px 40px rgba(0,0,0,.34),0 0 0 1px rgba(0,212,255,.10);}
+.brandLogoImg{display:block;width:min(180px,56vw);height:auto;}
+.brandLogoCard.sm{display:none;padding:8px 12px;border-radius:14px;}
+.brandLogoCard.sm .brandLogoImg{width:74px;max-width:28vw;}
+.splashWord{font-family:Arial Black,sans-serif;font-size:clamp(1.45rem,7vw,2.5rem);letter-spacing:.03em;color:#eaf6ff;text-align:center;text-shadow:0 0 22px rgba(0,212,255,.15);}
+.splashSub{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:#7ca3c6;text-align:center;}
+.brandMini{display:flex;align-items:center;gap:10px;}
+.brandMiniCopy{min-width:0;}
+.logoWrap{display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:6px;}
+.logoNote{font-size:.62rem;color:#7ca3c6;letter-spacing:.12em;text-transform:uppercase;text-align:center;}
+.logo{font-family:Arial Black,sans-serif;font-weight:900;font-size:clamp(1.6rem,7vw,2.2rem);color:#00d4ff;text-align:center;margin-bottom:4px;}
+.sub{font-size:.65rem;color:#5a7a9a;letter-spacing:.14em;text-transform:uppercase;text-align:center;margin-bottom:22px;}
+.lbox{background:#111720;border:1px solid #1e2d3d;border-radius:12px;padding:20px;width:min(440px,100%);display:flex;flex-direction:column;gap:14px;}
+.nb{background:rgba(255,159,28,.07);border:1.5px solid rgba(255,159,28,.4);border-radius:8px;padding:13px;font-size:13px;color:#a0b4c8;line-height:1.85;}
+.nt{font-weight:700;font-size:.72rem;color:#ff9f1c;margin-bottom:6px;}
+.ar{display:flex;align-items:flex-start;gap:10px;background:rgba(255,159,28,.05);border:1px solid rgba(255,159,28,.3);border-radius:8px;padding:13px;cursor:pointer;}
+.ar input{flex-shrink:0;width:22px;height:22px;margin-top:2px;accent-color:#ff9f1c;}
+.ar span{font-size:13px;color:#a0b4c8;line-height:1.85;}
+.fl{font-size:12px;color:#5a7a9a;letter-spacing:.08em;display:block;margin-bottom:4px;}
+input[type=password],input[type=text],input[type=number],input[type=month]{display:block;width:100%;font-size:16px;padding:13px 14px;background:#192030;border:1px solid #1e2d3d;border-radius:8px;color:#e2eaf5;font-family:'DM Mono','Courier New',monospace;outline:none;-webkit-appearance:none;-webkit-text-fill-color:#e2eaf5;}
+input:focus{border-color:#00d4ff;}
+.em{font-size:13px;display:none;padding:3px 0;}
+.em-r{color:#ff4d6d;}.em-y{color:#ff9f1c;}
+.btn{width:100%;padding:14px;border-radius:10px;border:none;background:#00d4ff;color:#0a0e14;font-family:'DM Mono',monospace;font-size:16px;font-weight:700;cursor:pointer;min-height:50px;-webkit-appearance:none;}
+.btn:active{opacity:.8;}
+.btn2{width:100%;padding:13px;border-radius:10px;border:1px solid #1e2d3d;background:transparent;color:#5a7a9a;font-family:'DM Mono',monospace;font-size:16px;cursor:pointer;min-height:50px;-webkit-appearance:none;margin-top:6px;}
+
+.txCards{display:flex;flex-direction:column;gap:12px;width:100%;max-width:480px;margin-top:18px;}
+.txCard{background:#111720;border:1px solid #1e2d3d;border-radius:10px;padding:17px 14px;cursor:pointer;display:flex;align-items:center;gap:14px;min-height:70px;}
+.txCard:active{border-color:#00d4ff;background:#192030;}
+.txL{font-weight:700;font-size:.85rem;color:#00d4ff;letter-spacing:.07em;text-transform:uppercase;margin-bottom:5px;}
+.txBs{display:flex;flex-wrap:wrap;gap:4px;}
+.txB{font-size:.62rem;padding:3px 8px;border:1px solid #1e2d3d;border-radius:3px;color:#e2eaf5;font-family:'DM Mono',monospace;}
+
+header{margin-bottom:10px;border-bottom:1px solid #1e2d3d;padding-bottom:10px;}
+.hLogo{font-family:Arial Black,sans-serif;font-weight:900;font-size:clamp(1.1rem,5vw,1.5rem);color:#00d4ff;}
+.hTag{font-size:.58rem;color:#5a7a9a;margin-top:2px;line-height:1.5;}
+.hVer{font-family:'DM Mono',monospace;font-size:.55rem;color:#0080aa;}
+.atBar{display:flex;align-items:center;gap:8px;padding:8px 12px;background:#111720;border:1px solid #00d4ff;border-radius:6px;margin-bottom:11px;}
+.atLbl{font-family:'DM Mono',monospace;font-size:.6rem;color:#5a7a9a;flex-shrink:0;}
+.atVal{font-family:Arial Black,sans-serif;font-size:.74rem;color:#00d4ff;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.atBtn{font-family:'DM Mono',monospace;font-size:.62rem;color:#5a7a9a;padding:8px 12px;border:1px solid #1e2d3d;border-radius:4px;cursor:pointer;flex-shrink:0;background:transparent;min-height:40px;-webkit-appearance:none;}
+.atBtn:active{border-color:#00d4ff;color:#00d4ff;}
+.tabs{display:flex;border-bottom:1px solid #1e2d3d;margin-bottom:12px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{padding:11px 14px;background:none;border:none;border-bottom:2px solid transparent;color:#5a7a9a;font-family:'DM Mono',monospace;font-size:.7rem;cursor:pointer;margin-bottom:-1px;white-space:nowrap;min-height:46px;flex-shrink:0;-webkit-appearance:none;}
+.tab.on{color:#00d4ff;border-bottom-color:#00d4ff;}
+.tp{display:none;}.tp.on{display:block;}
+
+.steps{display:flex;flex-direction:column;}
+.step{padding:13px;border:1px solid #1e2d3d;background:#111720;}
+.step:first-child{border-radius:6px 6px 0 0;}
+.step:last-child{border-radius:0 0 6px 6px;}
+.step+.step{border-top:none;}
+.step.on{border-color:#2a4060;background:#192030;}
+.step.off{opacity:.4;pointer-events:none;}
+.sh2{display:flex;align-items:center;gap:8px;margin-bottom:9px;}
+.sn{width:26px;height:26px;border-radius:50%;background:#1e2d3d;border:1.5px solid #2a4060;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:.64rem;color:#00d4ff;flex-shrink:0;}
+.step.on .sn{background:rgba(0,212,255,.15);border-color:#00d4ff;}
+.sl{font-family:'DM Mono',monospace;font-size:.66rem;letter-spacing:.07em;text-transform:uppercase;color:#5a7a9a;}
+.step.on .sl{color:#00d4ff;}
+.cb{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:16px;padding:0 4px;border-radius:8px;font-family:'DM Mono',monospace;font-size:.54rem;background:rgba(0,212,255,.12);color:#00d4ff;border:1px solid rgba(0,212,255,.3);margin-left:4px;}
+select.hsel{position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;overflow:hidden;}
+.cs-btn{width:100%;background:#1a2535;border:1px solid #1e2d3d;color:#e2eaf5;font-family:'Hiragino Sans',sans-serif;font-size:16px;padding:13px 36px 13px 13px;border-radius:6px;cursor:pointer;text-align:left;min-height:50px;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='%234a6a88' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;}
+.cs-btn.ph{color:#5a7a9a;}
+.cs-ov{display:none;position:fixed;inset:0;z-index:8999;background:rgba(0,0,0,.5);}
+.cs-ov.open{display:block;}
+.cs-panel{display:none;position:fixed;left:0;right:0;bottom:0;z-index:9000;background:#111720;border-top:1px solid #2a4060;border-radius:16px 16px 0 0;max-height:68vh;overflow-y:auto;-webkit-overflow-scrolling:touch;box-shadow:0 -4px 24px rgba(0,0,0,.5);}
+.cs-panel.open{display:flex;flex-direction:column;}
+.cs-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;border-bottom:1px solid #1e2d3d;position:sticky;top:0;background:#111720;z-index:1;flex-shrink:0;}
+.cs-title{font-family:'DM Mono',monospace;font-size:.72rem;color:#00d4ff;letter-spacing:.08em;}
+.cs-x{background:none;border:none;color:#5a7a9a;font-size:1.3rem;cursor:pointer;padding:4px 8px;min-height:36px;-webkit-appearance:none;}
+.cs-body{overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1;}
+.cs-grp{padding:8px 16px 4px;font-family:'DM Mono',monospace;font-size:.6rem;color:#00d4ff;letter-spacing:.1em;text-transform:uppercase;background:#0a0e14;position:sticky;top:0;}
+.cs-item{padding:14px 16px;font-size:15px;color:#e2eaf5;border-bottom:1px solid rgba(30,45,61,.5);cursor:pointer;font-family:'Hiragino Sans',sans-serif;line-height:1.4;display:flex;justify-content:space-between;align-items:center;}
+.cs-item:active{background:#192030;}
+.cs-item.sel{color:#00d4ff;}
+.cs-item.sel::after{content:'✓';color:#00d4ff;margin-left:8px;flex-shrink:0;}
+
+.chip{margin-top:7px;padding:8px 11px;border-radius:6px;background:#0a0e14;border:1px solid #1e2d3d;font-family:'DM Mono',monospace;font-size:.62rem;line-height:2;display:none;}
+.chip.on{display:block;}
+.cr{display:flex;justify-content:space-between;flex-wrap:wrap;gap:2px;}
+.ck{color:#5a7a9a;flex-shrink:0;margin-right:4px;}.cv{color:#00d4ff;}
+.co{color:#4fffb0;font-size:.6rem;}.cw{color:#ff9f1c;font-size:.6rem;}
+.nd{font-family:'DM Mono',monospace;font-size:.68rem;color:#ff4d6d;padding:10px;text-align:center;border:1px dashed rgba(255,77,109,.3);border-radius:6px;}
+.rst{width:100%;margin-top:8px;padding:14px;background:none;border:1px solid #1e2d3d;border-radius:6px;color:#5a7a9a;font-family:'DM Mono',monospace;font-size:.65rem;cursor:pointer;letter-spacing:.07em;text-transform:uppercase;min-height:48px;-webkit-appearance:none;}
+.rst:active{border-color:#00d4ff;color:#00d4ff;}
+.rc{margin-top:12px;padding:13px;border:1px solid #2a4060;border-radius:6px;background:#192030;display:none;}
+.rc.on{display:block;}
+.ct2{font-family:Arial Black,sans-serif;font-weight:700;font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:#00d4ff;margin-bottom:9px;display:flex;align-items:center;gap:7px;}
+.ct2::after{content:'';flex:1;height:1px;background:#1e2d3d;}
+canvas{display:block;background:#0a0e14;border:1px solid #1e2d3d;border-radius:6px;width:100%;max-width:220px;height:auto;}
+.vb{padding:12px 13px;border-radius:6px;font-family:Arial Black,sans-serif;font-weight:700;font-size:.86rem;text-align:center;margin-bottom:9px;}
+.vok{background:rgba(79,255,176,.08);border:1px solid #4fffb0;color:#4fffb0;}
+.vwn{background:rgba(255,159,28,.08);border:1px solid #ff9f1c;color:#ff9f1c;}
+.vng{background:rgba(255,77,109,.08);border:1px solid #ff4d6d;color:#ff4d6d;}
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:9px;}
+.st{background:#0a0e14;border:1px solid #1e2d3d;padding:8px 10px;border-radius:6px;}
+.sk{font-family:'DM Mono',monospace;font-size:.54rem;color:#5a7a9a;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;}
+.sv{font-family:'DM Mono',monospace;font-size:.82rem;color:#00d4ff;}
+.dtbl2{width:100%;font-family:'DM Mono',monospace;font-size:.64rem;border-collapse:collapse;}
+.dtbl2 td{padding:5px 0;border-bottom:1px solid #1e2d3d;}
+.dtbl2 tr:last-child td{border-bottom:none;}
+.dtbl2 .dk{color:#5a7a9a;}.dtbl2 .dv{text-align:right;color:#e2eaf5;}
+.ctb{margin-top:11px;padding:12px;border-radius:6px;border:1px solid #2a4060;background:#111720;display:none;}
+.ctb.on{display:block;}
+.cvb{padding:11px;border-radius:6px;text-align:center;margin-bottom:10px;}
+.ci{font-family:'DM Mono',monospace;font-size:1.7rem;font-weight:700;line-height:1.1;margin-bottom:3px;}
+.cl2{font-family:Arial Black,sans-serif;font-weight:700;font-size:.85rem;}
+.ca{font-family:'DM Mono',monospace;font-size:.63rem;margin-top:4px;line-height:1.8;}
+.ctbl2{width:100%;font-family:'DM Mono',monospace;font-size:.64rem;border-collapse:collapse;margin-bottom:9px;}
+.ctbl2 td{padding:5px 0;border-bottom:1px solid #1e2d3d;}
+.ctbl2 tr:last-child td{border-bottom:none;}
+.ctbl2 .cdk{color:#5a7a9a;}.ctbl2 .cdv{text-align:right;}
+.cg{font-family:'DM Mono',monospace;font-size:.6rem;color:#5a7a9a;padding:8px 10px;background:#0a0e14;border:1px solid #1e2d3d;border-radius:6px;line-height:2.2;}
+.scat{font-family:'DM Mono',monospace;font-size:.62rem;color:#00d4ff;letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px;}
+.stbl{width:100%;border-collapse:collapse;font-family:'DM Mono',monospace;font-size:.63rem;}
+.stbl th{color:#5a7a9a;font-weight:400;text-align:left;padding:5px;border-bottom:1px solid #1e2d3d;font-size:.57rem;}
+.stbl td{padding:5px;border-bottom:1px solid rgba(30,45,61,.4);vertical-align:top;word-break:break-word;color:#e2eaf5;}
+.stbl tr:last-child td{border-bottom:none;}
+.tok{color:#4fffb0;}.twn{color:#ff9f1c;}.tmu{color:#5a7a9a;}
+.sl2{display:block;font-size:.55rem;color:#5a7a9a;margin-top:1px;line-height:1.4;}
+.mbg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:10000;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 12px 40px;}
+.mbox{background:#0a0e14;border:1px solid #1e2d3d;border-radius:14px;padding:20px;width:min(440px,100%);margin:0 auto;}
+.mttl{font-family:'DM Mono',monospace;font-size:.72rem;color:#00d4ff;letter-spacing:.1em;margin-bottom:13px;}
+.ml{font-family:'DM Mono',monospace;font-size:.62rem;color:#5a7a9a;display:block;margin-bottom:3px;}
+select.mf{width:100%;font-size:16px;padding:13px 36px 13px 13px;min-height:50px;background:#192030;border:1px solid #1e2d3d;border-radius:8px;color:#e2eaf5;-webkit-appearance:none;outline:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='%234a6a88' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;}
+.disc{margin-top:20px;padding:13px;border-left:3px solid #ff9f1c;background:#111720;font-size:.61rem;color:#5a7a9a;line-height:2.1;}
+.disc strong{color:#e2eaf5;}
+.dttl{font-family:Arial Black,sans-serif;font-weight:700;font-size:.68rem;color:#ff9f1c;margin-bottom:7px;}
+</style>
+
+<meta name="description" content="NeuroIntervention GC Lumen Strategy Checker">
+<meta name="format-detection" content="telephone=no">
+<meta name="application-name" content="Matching Catheter Pro">
+<meta name="apple-mobile-web-app-title" content="Matching Catheter Pro">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0a0e14">
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" href="./favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="16x16" href="./favicon-16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="./icon-512.png">
+<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
+</head>
+<body>
+
+<div id="bootSplash" class="splash" aria-hidden="true">
+  <div class="splashCore">
+    <div class="brandLogoCard"><img class="brandLogoImg" src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAASABIAAD/4QCARXhpZgAATU0AKgAAAAgABQESAAMAAAABAAEAAAEaAAUAAAABAAAASgEbAAUAAAABAAAAUgEoAAMAAAABAAIAAIdpAAQAAAABAAAAWgAAAAAAAABIAAAAAQAAAEgAAAABAAKgAgAEAAAAAQAAAN+gAwAEAAAAAQAAAIoAAAAA/+0AOFBob3Rvc2hvcCAzLjAAOEJJTQQEAAAAAAAAOEJJTQQlAAAAAAAQ1B2M2Y8AsgTpgAmY7PhCfv/AABEIAIoA3wMBIgACEQEDEQH/xAAfAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgv/xAC1EAACAQMDAgQDBQUEBAAAAX0BAgMABBEFEiExQQYTUWEHInEUMoGRoQgjQrHBFVLR8CQzYnKCCQoWFxgZGiUmJygpKjQ1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4eLj5OXm5+jp6vHy8/T19vf4+fr/xAAfAQADAQEBAQEBAQEBAAAAAAAAAQIDBAUGBwgJCgv/xAC1EQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/2wBDAAICAgICAgMCAgMEAwMDBAUEBAQEBQcFBQUFBQcIBwcHBwcHCAgICAgICAgKCgoKCgoLCwsLCw0NDQ0NDQ0NDQ3/2wBDAQICAgMDAwYDAwYNCQcJDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ3/3QAEAA7/2gAMAwEAAhEDEQA/AP38ooooAKKKKACiiigAooooAjILUoG33p2c9KxNX1zSNBs31HW76DT7WP7811MsMS/V3IA/Okk27JEycY6s1l680mVxjFfMGv8A7Yv7Ofhyf7FN4zstQuWO1ItJSfUt59Fa1jlTP/Aqitv2o9O1QB9A+HvxC1WFvuTw+HZYYWHqr3JhBrp+pYhLmcbI5/rtD4ea59T+9L1r5pT9oa8A33Xwu+IUCeraTBL/AOOw3UjfpSH9qv4Sae6ReLbjVvCUshAC+IdG1DTV59ZZrcQj/v5QsHVfwIf1umfSn4VLjPWuO8M+NPCXjSz/ALR8Ja3p+tWy4Bm0+5juIxnsTGzAH2Ndh94VyuLWklY6FKL2I1244GKRcnoMCk6feNeZ+PfjD8MPhhF5njvxLp2jtt3rDc3Ci4kHqkC5lk/4Cpq4QlN2giJ1IwjzS0R6bjPT8qceRgcV8gWP7WFl4yJHwg8BeKvG0TEiLUIbJdN0uQj/AKe74xAf98V3Hhnxd+0Lr2r2Y1rwBovhrSGlUXb3XiE3t6kOeTGltaeUZMdAZcZ/iroqYKpG8amhhTxlKT90+jKKKK5jrCiiigAooooAKKKKAP/Q/fyiiigAooooAKQ9KWqskiRIZJGCqoJJPAAHc0ASZAGTzXz18Zf2lvhL8DrTd401cHUGUPDpVmBcX8gPQ+UCBGh7NIUU9jmvgr9qb/goC+ny3fgH4FXUcs0ZMN74iAEkYPRlswchsdPPOR/cB4evy78G+EfHnxt8eQ+H9DSfWNf1mYvJNcSNIxJ5lnuJmyQiDlmbP4nAr9ByDgWpXo/XcxnyUj4fN+Lo0qn1XBR5pn3x44/b9+OPxZ12Lwb8E9D/ALEa/fybVYIhqGqT592Tyo+OTtXMfJ8zAzXtXw5/YH8U+OpoPGH7UPizU9YvmAf+yYrtrho84Oye6d5OOxjgAA7Smvrj9nD9mDwV+zz4dWKwRNR8R3cSjUdZkTbLKepjhByYoQeijlsAsSQMfUXIU5avOzHP6NKTo5PDkh/N9p/M9DA5LVq/vcwlzS/lPMfh/wDB34YfC22Ft4B8Nafo21dhlt4QbiQejztumk/4Exr1BsY6UnTgkClwCODXyM3OT5mz6SnSjGPLBWRNgVUkhinjaGVA6OCpVxkEHqCD1FW6Kk0Pmbxh+yx8GvFV1/bVjpLeFtdXJh1nw1KdJvYmP8QNviN295I2r5Q8fftCfEf9kLxJY+GfH3iPT/iboF6C0KsyWfiWyjA+UzomY5Yz/DIwzIQeVxinfteftzw/D2W8+Gfwhmiu/EUeYdR1YYlg01ujRRg5WW5H8ROUiPBDNkL+MKJ4n+IniqODN1rWva3eJEryO09zc3FywUZZiS7Mx6k1+ocK8J18ZS+s5k/3Hn/Xun51xBxFQw1X2OA/iH39q/7V37Tf7Uni5PAHwihPh2C8JIt9MYrPHADzJdagV3RqmeWj8oHIGCSAfuf4G/sKfDzwEYvEnxKI8b+K5CJp579TLZQzHk7IpM+aQf8AlrNknAIVDxX54+P/AIY/Fb9g3xV4U8d+EtZ+0jVrNY74hSbOS8iAa4s5kyPNgO4GJjtc4JG1lzX6/fs8ftA+Fv2g/BieItC/0TUrPbDqunSNmS0nYZHPG+KTBMUmOQCCAwYDm4lTo4dVcoVsM+q/9uOnh6ftazjmX8Y+g4oo7eNYYVCIgCKqDAAHAAA6AVcoor84PvAooooAKKKKACiiigAooooA/9H9/KKKKACiiigCBx3NfjT+3t+1nczX198DPh5emK3gzD4jvoG+aZ+N1ijDpGnScjlj+64AkDfoH+1b8Yf+FKfBnWfFdpIE1a5A0/Ss4/4/bgEI+DwfJUNNjv5eO9fzK3FxPe3El1cSPLLM5kdnJdmdzkkk8kk9TX6X4d8ORxtX67iF7sdv8R8Bxrn8sLGOFo/GyOFJJplhjUszkAADJJPQAV/Rd+xj+zdZ/AnwBFqet2wHjDxBEtxqbsA0ltGfmSzU9hH1kx96TPJCrj8rv2Bvg9F8Tvjda61qkPm6T4QiGrTBhmN7kMVtIz/21/e4PBERHev6JQvy47V3eJefynWWWU37sfi9Ti4DyRRh9eqx1fwk1FFFfkx+mHzp8M9a1Ww+KXxD+HWuXlxdiC6s/EOkNdSNJINN1aNleFCxP7q3u7eZVA4RHUDAAA+hAAoHtXzN4mVdD/aj8Fakv/My+Fdd0mX66dPaXcJPuA8uPqa+mBnG0+ldGKjqpLqjmw03Zw7CkDbkjFfmr+3P+1hJ8MdOf4V/D682eKtSh3X95A3z6XaSDgKR925mH3O8cfzcFozX1P8AtHfHDSfgL8NL7xheBJtSf/RNIs2J/wBKvZAfLBA58tAC8h4+RSAckZ/mb8TeJNY8W69feJPEF1Jfanqc8l1dXEpy0sspyxPYewHAHA4r7rgPhaOY4j6ziF+6j+J8hxfnzwlL2NKXvGEXdmLNlstuJPUmv1v/AOCbnwDW7ubr46eJLfMVtJJZaAsg4MxBW4uhn+6D5MZ55MndRX5r/CP4ba58W/iHo3gHw+MXGrTiJ5cZWCBfmmnYf3YowWPrjA5Ir+ozwP4P0TwB4T0rwb4bh+z6dpFrHaW8Z67IhjLHHLMcsx7kk96+z8S8/jQoRy6i9Zb+h8xwHlPt6n1uptE+Uv8AgoJ4ah8Q/s063fugefQruw1K3PcP56WzEf8AbKeSvxJ/Z9+NOufAr4lab440tmktd4ttVswcC7sZCPMi9N4xujJ6SAHpkH9//wBr+OOX9mzx7G/QaU7firoR+or+ZF1YHbjpXN4cYejjMqrYXEL3ZS/Q6OOa1XC5hSxNE/ro8Pa7pPijQ9P8R6JOl1p2pW0N3azJ92SGZQ8bD6gitzkDHXNfmr/wTV+KMniv4Wal8PtQnMtz4TulNvvPP2C/3vGvPJ2TJMPZSo9K/SwgZB9K/I80wMsFip4Wp9k/ScuxkcXQhXiSUUUV553BRRRQAUUUUAFFFFAH/9L9/KKKKACiiigD8X/+Cpni2aTW/BXgaJ2WKC3udVmUHh2mkSCEkf7Ailx/vGvyUPrX6Wf8FQbeUfGnw9dMP3UvhmCNPTfHeXhb9GFfmiD0r+lvD2mlklJR8/zPwPjKrzZnUR+73/BMnwdFonwZ1jxS6AXOv6y6+ZjlrayRY4h+ErTfnX6UdhXxf/wT9WIfsveF/L+8Z9U8z/e+33H9MV9ofwV+A8R1ZTzKtKX80j9mySlGngKUI/yk9FFFeOesfLXxJDTftHfB23h+Z7e28VXUu3+GIWttCCfYvKBX0vJIkMZlkYKiAkknAAHUk18veDbgePf2lfF/iy1PmaX4G0e38I20g5jk1K8cX2obT2aFVtom9DkV47/wUC+OzfDT4ZjwFoVx5eveMFe3JQ/vLfTBxcPx0MufJX1Bcg5WvWw+BrYrEUsHSXvW/wCCeTUx1PDUZ4mXwn5fftk/H5/jn8UJ5dKlL+GtBLWGkgP8sig/vrrHrM4BH/TMIDyDXyH0OBS7fevZ/gD8IdT+N/xR0nwFYbktrhvO1KdRn7NYwkGd/TOPlTPBkZR3r+msPRw2TZcltCCPwTEVK+ZY33vikfqx/wAE3Pgf/wAI14Ru/jJrdvtv/EQNppXmD5otNib53Hp9olX/AL4jUjhq/Uk8isXRNG03w7pFnoOj26Wun6dbxWlrBGMJFDCoREA9FUACtc9eO1fzBm2ZVcfip4mr8Uj+gcuwUMHhY0YnyX+23q0ej/sy+NZmcBri3tbSMdybi6t48D8CT9BX82KMN4Jr9wv+CnnjaPS/hv4c8CQvi413VDeSoD1tbBMEEehlmjI/3TX4ddWNftvhdhPZ5dOrL7Uj8p4/xD+vRt9k/Rb/AIJoa/Lpnx2vtEd/3Or6DdRbB0Mtu8MiN9QiyD8a/fHpk1/PL/wTstZLj9pTTJYhxb6ZqUrf7ph2fzYV/Q1n734V+e+I8IxzeTj2R9rwPKUsrXMTUUUV8GfYhRRRQAUUUUAFFFFAH//T/fyiiigAooooA/Lb/gpb8KLzxH4A0X4maVC8j+F53gv1QZIsr0oA59opkUe3mE9BX4esChxX9duraVpuuadc6Pq1vHdWd7C9vc28wDRywyKVdWU8FSCQRX4Y/tKfsD+NPAmoXfif4SWc3iLw1KzSiwgBm1KxBOdmzl7mIfwtHmTH3l43H9d8PuLMPhaf1DGO0VsfmXGfDdSpP61h1qfV/wDwTN8fWWsfC3WPAUso+3+H9RedVJ5NnfKGRgO+JllB+o9a/TcjAr+U34X/ABQ8dfAvxxD4r8JzGx1O03W9xbzRkxTxE/Pb3ERwSpIGRwQQCCGAI/WPwf8A8FQvh/dafEPHXhbV9OvcBZDphhvYGI6keY0DqD6YbHTJ615fF/BuMhjJYjCQ54SO/hnifC/VY0sVLllE/U3tx+FeA/HX4t3Pw60a10LwnANV8deKJGsPDelLyZbkjm4lH8NtbD95KxwuBgkZyPJ9I/aT+Jvxdt1h+B3wz1SCKcYXXPF+3TdMgB/5aiONpZboD+7C2fXFev8Awv8AgrbeDNUu/HXi/UpfFXjnVoxFfa3dIIxFCDkWtlAPltbVf7q8ueWJ4A+DVBYeV6/TofXuv7f3aO3cn+GPgrRvgN8KFs9Y1BZG0+G51bX9VmJ/0i8lzPe3UjHkgtnGeiADtX86v7QPxe1L41/FTWfHl8XS3uZfs+nWzH/j3sIciBPQHHzSY4Mjse9fp1/wUf8A2gBpGjQfA3w1cf6XqaLd640Z5itAd0FsSOhmcBmHB8sL1D1+LJbPJ6mv2Tw2yRpSzPEbv4fQ/L+N84gnHA4fZD1yWC+vav6Df2Df2fD8IfhuPF3iC28rxN4sjiuZlkGJLSxxut7fnlGbPmSjj5yFIylfA37Cf7L0nxU8TQfE/wAY2h/4RPQpw9tFKvy6lfREkIAfvQwnmU9HOE5/eY/fBFC/KOgrxvEjiZVqn9nYd+7H4j1uCMh9mvrtb/t0kGDjPamnaq5NIv3RXyt+1v8AHCL4GfCPUdYs7gLr+qq2naLHkbhdSrzPj0gXL5xjdtU/eFfleGw0qtVU6e7P0PE1o0aTqy+yfjX+3F8VI/ih8d9WSwl83S/DaDRLMg5Vnt2Y3DjHB3TMwBHVAteEfCnQfhdr+uTWXxU8Q3vhnTzD/o93Z2X2r98XUYdQdwjCknIBPFeXyO7uXlJZmO4luSSe5oDcV/VWEyZYXLlgqEuWy+I/njFZmsRi3XqwP1i1nwl4W/4J66to3xL8N3r+Or3xbZ3em2trc7bKGO0BgnkuEljE5Y58pQMAYcnNfor8C/iB8Z/iBZPrPxI8GWfhPS7m0gudNMWoC7upvO+Yb4gn7seWQfmIYHgr1x+CXx8+J+r+Pb3wb4f1GGa1i8G+FNI0gQ3AKyG5S1ja5mZTyCzEL7hVNf0XfBu+GrfCXwZqoP8Ax+eH9Lnz/wBdbWJv61+H8WYCvh8LRrYxXrT5rv8AI/V+G8VCtWqU8P7tOJ1PiKfWbTQdRuPDdpDe6tFazNY2txL5MM1wFJjR5MHYrNgE44r8sfGP/BQn4r/Djxfd/D/xf8NLGLX7KSKKW1t9WM3zTIkqbTFHKG3pIpABzzg88V99/H/4z6L8CvhtqXjjVcS3EQ+z6baE4N3eyA+VF6heC0hH3Y1Y9Rivhf8AYs/Z51Xxdr8/7UHxlRr3VtXuGv8AQ4Lpf4pixN8yHgZzi2XoifMB/qiPIyajhKWHqYvH0+aHTp7x6WbVcTUrxw2Enyy/9tPrn4J/Ej9oPx1qpuPiV8OoPBmgSWRlhmkv1lvWn3LtRrb78YKls+YqEYr6mzxmmBSDkcUrAYzn+lfOVaylK6Vke/RpSpRs3cnooorM1CiiigD/1P38ooooAKKKKACjGaKKAPPvEnwy+HfjGTz/ABX4X0bW5AMB9Q0+3ujj0zKjGq2g/CX4X+FrhLvw54Q0HSZ0OVlsdNtreQH2aKNTXo/CjikwD0/SrVWVtHoZ+whe9iM4zuK14n8dvjFoPwN+HWp+OdbIkkhHk6faE4a7vZAfJhHfBILMR92MMe2K9H8V+KtA8F6Be+KfFN9Dpml6bEZrm5nbbGij9SSeFUAliQACSBX86v7T37QniL9pX4kQx6Ja3X9iWMjWmgaVGpknk3kAzMiZzNcEDgZ2AKozglvpOF+HqmZ4nktamviZ4ef53DL8P/eZ84+MPFet+PPFGpeLfEdy13qmr3Ml1dTHu7HOAOyoOFQcAAAcCvqL9lL9lDxF8fNfTVtVSbTfBmnzD7ZqGNsl06cm2tSerH+JuREOTk7VP0P+zh/wTu13Xbi08WfHMNpWmArLFoEUmL24HUC4df8AURnuoPmnkHyiM1+yuh6Do/hjR7XQPD1nDp2n2MYhtraBBHFFGvRVUDAH/wCuv0HibjyhQofUMq32v0X+E+L4f4SrVqv1vH6MTw54a0Pwlotj4b8OWcVhpmnQpbWttCMJHFGMAD+pPJPJJNdEQeg6UDnhu9cF4++Ivg34YeHLnxX451SDStMthzLMeWOMhI0GXlkOOFUFj2FfjKU6jstWz9RlKEI66I0vFfirQfBfh6+8VeKLyLT9L0yFp7i4lOFRF/UknAVRksSAASQK/mz/AGnPj/qv7QHxGuPEUvmW+i2Ia10exY/6m0BB3MBkedMfmkPPZckKK7b9qj9rfxF+0Hqv9kaWsukeDrGXdaacxHm3Ei8C4uipILY+7GCVjB4ycsfjtFbcB1Jr934E4OlgF9exv8T/ANJPx3irilYx/VsJ8A3p3r70/Yk/Zbu/jN4si8beLbMjwZoU4aXzV+XUruPDLbrnrGDgzH0+Tq2R0v7Mn7Bni74k3Np4t+KUNz4d8LZWVbVwYtQ1BeoCoRm3iPeRvnI+4uD5g/cnw34a0Pwbotl4c8MWMOnaZp8QhtrWBdiRoOwHqepJ5JySSSTXDxpx5TUHgsvlr1kdfC3B85SWKxi0/lP5zP23LD+yP2n/ABtaouFaeznGOn7+yt5T+r1+4X7LmuWlz+zT4E1e7kWKC10C3ikldgI40sgYWLMeAFEXOemK/Hv/AIKL6aLL9pLULvp/aGl6dc/XbH5H/tKup8D/ABc8W/Ez4FeA/wBkj4VeYNa1aW+i1+8wyx21g97NOELDny/KbzJiP+WYEY3FmWsM8wE8bkGDqJ7W5vJcpvleNjg83xEH/wBunvGn2t5+3Z+0LJrd2sv/AAqXwBL5UEbArHqMuQcDOPmuigZ+6W4VTtZgTy/7WP7ZPxCt9XvfBvwTebR/Cfh+7/se816zg4uL9FLG3gn2tHFHGFIULh32lgdmK/Uv4Q/C7wz8HPAel/D/AMLR7LSxQb5SMS3Vw3Ms7kfxyNz6AYUYAAHgf7RPwT+HmlfsreKfBHh2ztdC0zR7KbVrMNIcJd20n2kEyzMWMkzAxZZiT5mM9K+Mwea4P6/TjVp81KOkV+vqfTYjLMSsI5xny1Ptf/Innv7J/wC1fF4k+A+t+Lfi/q0YvPBE3laheMFEtxbTKGtWKpjdNI26FABmQqOrEmvif41ftb/tQa9LZfEPQY9R8E+B7+6kj0QxW6BbjyeczTSIfOZwMkf6rghQcMT4L+yL4a8KeO/jRoPgPx3LcHQNTmNxJYpKY7e9u7KKWS2ScZ5U5kUd/nKgjcTX9HV/4O8J6xp1lper6PYXtlpssM1nBcW0bw28tuMQvCjArG0Y4QqAU7Yr1M8pYLI80lH2XOn+B5+UyxeaYGPv8thngO/1rVfBXh/U/EcXkatd6XZXF/Ft2+XdSwq0y7e2HJGO1djjLZpFXA4pFHf0r85k1KT0PulGyUSaiiimWf/V/fyiiigCLop4r8t/2sf24PiD8FfiZP8ADnwXoOnBbK2t5pb7VY5pvtBnQS5gWOWEBEztJJbLhhxiv1GAPc15l8QvhB8M/ipax2vxA8PWOtCIEQyXMP76EHqIp12yxg9wrDNellOIw1HERqYunzw7HnZjQr1aXLhpcsj8fdG/4Kg/Fy2lH9u+GvD99EOotku7Rz/wJpph/wCO17v4W/4KleCrtlj8ZeDdT04HgyaddQ3w+u2VbUgfifxr3y9/4J8/sxTSGS38P3lop/5Zw6ldlB/38lc/rVzTv2Bf2X7Mh38KzXZHTztSviPyW4UH8RX1+KzDhapH3KMov+v7x81hsFn0Za1Y/cbXhH9t39mvxaqRReLbfSrhxzDqsUtltz6ySJ5P5SGrutftafDqaSfSPhfBqHxI1yIcWfhu3e4hUnhWnvCotooieDJ5jY9DXW6H+y/+z94cVf7M8A6Dlej3Nkl1IPo1wJX/AFqvqn7Kn7POry+fN4D0a3lByGsYTYEH1BtTFj8K+WlLKvaNxU0v69PzPfjHMeS0uU+SfFP7On7RP7T2sW9/8ddctfBPhe3fzbXw1pDC9mTtmWUHyTNtOPNLSgc7UUEivrr4Rfs4fCX4I24/4QnRI01Ep5cuq3Z+0X8oIwczMPkDd0iCIf7tZSfsq/CW0wNG/wCEh0zHQWfiXV4gPoDeED8BVr/hmrwqq4j8UeOUX+6PFurAf+lNaYnM3Woqiqlqf8qWn5mdDASpS9rJc0v8R9CBlH3iBXm/jL4yfC74fRO/jPxTpWktECTDcXSLOcdlgBMrn2VSa8yvv2SvhNrA8rxFN4k1lD1S/wDEuqzA/UfahVPTv2LP2Y9HYPbeBLKTHP8ApVxdXQ/KeaQVxQjg7/vZN+i/4J3TeLf8JRR8u/F//gpZ4M0WGbTvg/pUviC95CajqCta6ep7MsZxcy/QiL69q/OHXrD9qD9qLX08Q32ka/4lMmRbsts8enW6MfuwnCW0Kn6gnGSSea/ob8O/B74U+D3WXwv4P0TSpUx+9tNPghkyO5ZEDE++a9JVFQYX5fyr6PLeJsNlv+44f3v5pHz2P4exGYS/2qv7v8sT8KPhz/wTS+LHiCSK7+IOqaf4VtCBvijI1G9+mxGEA9M+ccehr9LPg7+x18F/g1JBqek6UdW1uHBGq6sVuZ0cfxQpgRQkHoY1D44LGvrHIpNoIzmvOzXirMcfdV52XZHpZfw7gMJ/CiSgADiloor549w/Bv8A4Kb2BX45aJdqMC48M26H3K3dyP5EV90/sN/s2L8GfAo8WeJ7bb4t8SwRyXAkH7yxsjhkteeQx4ebp8+FI/dgn6q8VfCX4ceN9c07xN4t8O6fq2qaRt+xXV1CJJIdrbwBnggPyAcjNejgLgjoBX02L4nq1MqpZbHSMdz57D8Pwjj5Y6e5+d37ef7R/jj4JaV4c0H4ezDT9T1x7i4uNRMaSmG3szGNkayq6ZleT5iQSFGBywI8j8L678Sf+CgOvabBr2my+GPhToLQz6tBDMx/te/QA+QJAELBT2HES/MSXKY/Tbxh8OvAnxAgt7bxxoGna/DayGSBNQto7kQucZKeYDtzgA46966PRtF0nQNPi0jQrODT7G1Xy4LW1iWGCJB0VEQKqgegFYUM1w1HBwhRpfvV9sutlVWripTnP91L7J/NR8Z/COtfs2/tFahFoMBtP7D1eLWdEYg+WbQyi4tcH+JFH7pvUowPcV+uv7MvjD4lftB+Or347+KLe58P+ELSwbR/DuhiZzDPLIytdXchxGJiDH5YYps52jmMk/Xfi34Y/Dvx/Ja3HjfwzpOuSWZPkPqFnFdGLJyQpdTgE9R0PcV11taW1jbR2tjEkEECLHFFEoVFVRgKqgYAA4AHArvznif6/hoRlS/exVuY5Ms4deDxMqkJ/u/5TXooor5E+pCiiigD/9b9/KKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigD/9f9/KKp0UE8xZylGUqo3WhetAczLqnIobpUQ6CnUnoUh56ion+8aP8ACmv0NR2JkOT7wqaqg61OOlAobD8CjAplIvb6VXMyx3Rc0dVzUJ6Uq/dNDYvtEoxtzQcbc0lFHMyraEn6UhGaZ/EaT+EfSknYRLTD1NRjrUa9W/GqgKRYylGUqp/FR6UxczJwcVPVI9fwFWaAiO/Kj2NRdvxpy/dFVylEmRS1CvWm0cpPMf/Z" alt=""></div>
+    <div class="splashWord">Matching Catheter</div>
+    <div class="splashSub">NeuroIntervention GC Lumen Strategy Checker</div>
+  </div>
+</div>
+
+<div id="pgLogin">
+  <div class="logoWrap">
+    <div class="brandLogoCard"><img class="brandLogoImg" src="data:image/jpeg;base64,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" alt=""></div>
+    <div class="logo">Matching Catheter</div>
+    <div class="logoNote">NeuroIntervention Reference Tool</div>
+  </div>
+  <div class="sub">Secure Access — v5.45</div>
+  <div class="lbox">
+    <div class="nb"><div class="nt">⚠ ご使用前に必ずお読みください</div>本ツールは<strong style="color:#e2eaf5">医療機器ではありません</strong>。薬機法第2条第4項の「医療機器」に該当しません。脳血管内治療に従事する<strong style="color:#e2eaf5">医療従事者向けの学習・参照目的ツール</strong>です。必ず最新のIFUを確認のうえ使用してください。</div>
+    <label class="ar" for="agCk"><input type="checkbox" id="agCk"><span>本ツールが医療機器でないこと、参照・学習目的のみに使用すること、最終判断は術者が最新IFUを参照したうえで行うことに同意します。</span></label>
+    <label><span class="fl">PASSWORD</span><input id="pwIn" type="password" placeholder="パスワードを入力" autocomplete="off" autocapitalize="none" autocorrect="off"></label>
+    <div id="emAg" class="em em-y">⚠ 上記の同意にチェックしてください</div>
+    <div id="emPw" class="em em-r">⚠ パスワードが違います</div>
+    <button class="btn" onclick="doLogin()">ログイン</button>
+  </div>
+</div>
+
+<div id="pgTx">
+  <div class="brandStack">
+    <div class="brandLogoCard"><img class="brandLogoImg" src="data:image/jpeg;base64,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" alt=""></div>
+    <div class="logo">Matching Catheter</div>
+  </div>
+  <div class="sub">治療領域を選択してください</div>
+  <div class="txCards">
+    <div class="txCard" onclick="selTx('aneurysm')"><span style="font-size:1.9rem;flex-shrink:0">🧠</span><div><div class="txL">Aneurysm · CSDH · AVM · AVF</div><div class="txBs"><span class="txB">Aneurysm</span><span class="txB">CSDH</span><span class="txB">AVM</span><span class="txB">AVF</span></div></div></div>
+    <div class="txCard" onclick="selTx('ais')"><span style="font-size:1.9rem;flex-shrink:0">🔴</span><div><div class="txL">AIS · ICPTA · ICS</div><div class="txBs"><span class="txB">AIS</span><span class="txB">ICPTA</span><span class="txB">ICS</span></div></div></div>
+    <div class="txCard" onclick="selTx('cas')"><span style="font-size:1.9rem;flex-shrink:0">🩺</span><div><div class="txL">CAS · VAS · SAS</div><div class="txBs"><span class="txB">CAS</span><span class="txB">VAS</span><span class="txB">SAS</span></div></div></div>
+  </div>
+</div>
+
+<div id="pgMain">
+  <header><div class="brandMini"><div class="brandLogoCard sm"><img class="brandLogoImg" src="data:image/jpeg;base64,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" alt=""></div><div class="brandMiniCopy"><div class="hLogo">Matching Catheter</div><div class="hTag">NeuroIntervention GC Lumen Strategy Checker — 参照・学習目的専用</div><div class="hVer">v5.45 / branding removed + contrast caution updated</div></div></div></header>
+  <div class="atBar"><span class="atLbl">TREATMENT</span><span class="atVal" id="atVal">—</span><button class="atBtn" onclick="goPage('pgTx')">◀ 変更</button></div>
+  <div class="tabs">
+    <button class="tab on" id="tb0" onclick="swTab(0)">▶ CHECKER</button>
+    <button class="tab" id="tb1" onclick="swTab(1)">⊕ FINDER</button>
+    <button class="tab" id="tb2" onclick="swTab(2)">◈ CONTRAST</button>
+    <button class="tab" id="tb3" onclick="swTab(3)">≡ DEVICES</button>
+  </div>
+
+  <!-- CHECKER -->
+
+  <div class="tp on" id="tp0">
+    <div class="steps">
+      <div class="step on" id="cs1"><div class="sh2"><div class="sn">1</div><div class="sl">GC / BGC / Sheath / DAC / 吸引</div></div>
+        <button class="cs-btn ph" id="btn-cGC" onclick="csOpen('cGC','外管を選択')">-- 外管を選択 --</button>
+        <select class="hsel" id="cGC" onchange="cONgc()"></select>
+        <div class="chip" id="cGCch"></div></div>
+      <div class="step off" id="cs2"><div class="sh2"><div class="sn">2</div><div class="sl">Device A<span class="cb" id="cCA">0</span></div></div>
+        <div class="nd" id="cNA" style="display:none">⚠ 収容できるデバイスがありません</div>
+        <button class="cs-btn ph" id="btn-cDA" onclick="csOpen('cDA','Device A')" style="display:none">-- なし（GCのみ）--</button>
+        <select class="hsel" id="cDA" onchange="cONa()"></select>
+        <div class="chip" id="cDAch"></div></div>
+      <div class="step off" id="cs3"><div class="sh2"><div class="sn">3</div><div class="sl">Device B<span class="cb" id="cCB">0</span></div></div>
+        <div class="nd" id="cNB" style="display:none">⚠ Aと同時収容できません</div>
+        <button class="cs-btn ph" id="btn-cDB" onclick="csOpen('cDB','Device B')" style="display:none">-- なし --</button>
+        <select class="hsel" id="cDB" onchange="cONb()"></select>
+        <div class="chip" id="cDBch"></div></div>
+      <div class="step off" id="cs4"><div class="sh2"><div class="sn">4</div><div class="sl">Device C<span class="cb" id="cCC">0</span></div></div>
+        <div class="nd" id="cNC" style="display:none">⚠ A+Bと同時収容できません</div>
+        <button class="cs-btn ph" id="btn-cDC" onclick="csOpen('cDC','Device C')" style="display:none">-- なし --</button>
+        <select class="hsel" id="cDC" onchange="cONc()"></select>
+        <div class="chip" id="cDCch"></div></div>
+    </div>
+    <button class="rst" onclick="cRST()">↺ リセット</button>
+    <div class="rc" id="cRes">
+      <div class="ct2">収容チェック結果</div>
+      <canvas id="cCV" width="200" height="200"></canvas>
+      <div class="vb" id="cVD" style="margin-top:10px">—</div>
+      <div class="sg"><div class="st"><div class="sk">GC I.D.</div><div class="sv" id="cGI">—</div></div><div class="st"><div class="sk">包絡円径</div><div class="sv" id="cEN">—</div></div><div class="st"><div class="sk">クリアランス</div><div class="sv" id="cMG">—</div></div><div class="st"><div class="sk">占有率</div><div class="sv" id="cFL">—</div></div></div>
+      <table class="dtbl2" id="cDT"></table>
+      <div class="ct2" style="margin-top:12px">造影クリアランス（理論値・要臨床判断）</div>
+      <div class="ctb" id="cCTB"><div class="cvb" id="cCVB"></div><table class="ctbl2" id="cCTL"></table><div class="cg"><span style="color:#4fffb0">◎ 0.025"以上 → 造影余裕ありの目安（低圧・手押し前提）</span><br><span style="color:#ff9f1c">○〜△ 0.015〜0.025" → 条件付き（希釈 / ゆっくり / distal注意）</span><br><span style="color:#ff4d6d">× 0.015"未満 → 原則厳しい（別ルート・位置調整を検討）</span><br><span style="color:#5a7a9a">※ 実臨床ではカテーテル位置、蛇行、血栓性状、希釈率、手押し圧で大きく変動</span></div></div>
+    </div>
+  </div>
+
+  <!-- FINDER -->
+
+  <div class="tp" id="tp1">
+    <div class="steps">
+      <div class="step on" id="fs1"><div class="sh2"><div class="sn">1</div><div class="sl">Device A（必須）<span class="cb" id="fCA">0</span></div></div>
+        <button class="cs-btn ph" id="btn-fDA" onclick="csOpen('fDA','Device A')">-- 選択 --</button>
+        <select class="hsel" id="fDA" onchange="fONa()"></select>
+        <div class="chip" id="fDAch"></div></div>
+      <div class="step off" id="fs2"><div class="sh2"><div class="sn">2</div><div class="sl">Device B（任意）<span class="cb" id="fCB">0</span></div></div>
+        <button class="cs-btn ph" id="btn-fDB" onclick="csOpen('fDB','Device B')">-- なし --</button>
+        <select class="hsel" id="fDB" onchange="fONb()"></select>
+        <div class="chip" id="fDBch"></div></div>
+      <div class="step off" id="fs3"><div class="sh2"><div class="sn">3</div><div class="sl">Device C（任意）<span class="cb" id="fCC">0</span></div></div>
+        <button class="cs-btn ph" id="btn-fDC" onclick="csOpen('fDC','Device C')">-- なし --</button>
+        <select class="hsel" id="fDC" onchange="fONc()"></select>
+        <div class="chip" id="fDCch"></div></div>
+    </div>
+    <button class="rst" onclick="fRST()">↺ リセット</button>
+    <div class="rc on" style="display:block">
+      <div class="ct2">収容可能 GC / BGC / Sheath</div>
+      <div id="fList"><p style="font-family:monospace;font-size:.68rem;color:#5a7a9a">Device Aを選択すると候補が表示されます</p></div>
+      <div id="fViz" style="display:none;margin-top:12px"><div class="ct2" id="fVizT">断面図</div><canvas id="fCV" width="200" height="200"></canvas><div id="fVD" style="margin-top:7px;font-family:monospace;font-size:.7rem;text-align:center"></div><div id="fInfo" style="margin-top:8px;font-family:monospace;font-size:.65rem;color:#5a7a9a"></div></div>
+    </div>
+  </div>
+
+  <!-- CONTRAST -->
+
+  <div class="tp" id="tp2">
+    <div class="steps">
+      <div class="step on" id="xts1"><div class="sh2"><div class="sn">1</div><div class="sl">外管（GC/BGC/Sheath/DAC/吸引）</div></div>
+        <button class="cs-btn ph" id="btn-xGC" onclick="csOpen('xGC','外管を選択')">-- 外管を選択 --</button>
+        <select class="hsel" id="xGC" onchange="xONgc()"></select>
+        <div class="chip" id="xGCch"></div></div>
+      <div class="step off" id="xts2"><div class="sh2"><div class="sn">2</div><div class="sl">内管 A<span class="cb" id="xCA">0</span></div></div>
+        <div class="nd" id="xNA" style="display:none">⚠ 収容できません</div>
+        <button class="cs-btn ph" id="btn-xDA" onclick="csOpen('xDA','内管 A')" style="display:none">-- なし --</button>
+        <select class="hsel" id="xDA" onchange="xONa()"></select>
+        <div class="chip" id="xDAch"></div></div>
+      <div class="step off" id="xts3"><div class="sh2"><div class="sn">3</div><div class="sl">内管 B<span class="cb" id="xCB">0</span></div></div>
+        <div class="nd" id="xNB" style="display:none">⚠ Aと同時収容できません</div>
+        <button class="cs-btn ph" id="btn-xDB" onclick="csOpen('xDB','内管 B')" style="display:none">-- なし --</button>
+        <select class="hsel" id="xDB" onchange="xONb()"></select>
+        <div class="chip" id="xDBch"></div></div>
+      <div class="step off" id="xts4"><div class="sh2"><div class="sn">4</div><div class="sl">内管 C<span class="cb" id="xCC">0</span></div></div>
+        <div class="nd" id="xNC" style="display:none">⚠ A+Bと同時収容できません</div>
+        <button class="cs-btn ph" id="btn-xDC" onclick="csOpen('xDC','内管 C')" style="display:none">-- なし --</button>
+        <select class="hsel" id="xDC" onchange="xONc()"></select>
+        <div class="chip" id="xDCch"></div></div>
+    </div>
+    <button class="rst" onclick="xRST()">↺ リセット</button>
+    <div class="rc" id="xRes">
+      <div class="ct2">造影クリアランス判定（理論値・要臨床判断）</div>
+      <div class="cvb" id="xCVB"></div>
+      <canvas id="xCV" width="200" height="200" style="margin-bottom:10px"></canvas>
+      <div class="sg"><div class="st"><div class="sk">外管 I.D.</div><div class="sv" id="xGI">—</div></div><div class="st"><div class="sk">包絡円径</div><div class="sv" id="xEN">—</div></div><div class="st"><div class="sk">造影クリアランス</div><div class="sv" id="xMG">—</div></div><div class="st"><div class="sk">占有率</div><div class="sv" id="xFL">—</div></div></div>
+      <table class="ctbl2" id="xCTL"></table>
+      <div class="cg"><span style="color:#4fffb0">◎ 0.025"以上 → 余裕ありの目安</span><br><span style="color:#ff9f1c">○〜△ 0.015〜0.025" → 条件付き</span><br><span style="color:#ff4d6d">× 0.015"未満 → 原則厳しい</span><br><span style="color:#5a7a9a">※ 低圧・手押し、希釈、位置確認が前提</span></div>
+    </div>
+  </div>
+
+  <!-- DEVICES -->
+
+  <div class="tp" id="tp3">
+    <div style="background:#111720;border:1px solid #1e2d3d;border-radius:6px;padding:13px;">
+      <div class="ct2">Device Specs</div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px;padding:8px;background:#0a0e14;border:1px solid #1e2d3d;border-radius:4px;margin-bottom:10px;font-family:monospace;font-size:.57rem;">
+        <span style="padding:2px 6px;border-radius:3px;border:1px solid rgba(127,212,255,.27);color:#7fd4ff;background:rgba(127,212,255,.04)">IFU = 添付文書</span>
+        <span style="padding:2px 6px;border-radius:3px;border:1px solid rgba(79,255,176,.27);color:#4fffb0;background:rgba(79,255,176,.04)">PMDA = 審査報告書</span>
+      </div>
+      <div style="margin-bottom:11px;padding:9px;background:#192030;border-radius:8px;border:1px solid #1e2d3d;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <span style="font-family:monospace;font-size:.58rem;color:#5a7a9a">DEVICE EDIT</span>
+        <button onclick="openMod()" style="padding:9px 13px;border-radius:8px;border:1px solid #00d4ff;background:#00d4ff;color:#0a0e14;font-size:14px;cursor:pointer;font-family:monospace;min-height:44px;-webkit-appearance:none;">+ 新規登録</button>
+      </div>
+      <div id="spAll" style="display:flex;flex-direction:column;gap:14px;"></div>
+      <div id="spGW"></div>
+    </div>
+  </div>
+
+  <div class="disc"><div class="dttl">⚠ 免責事項</div><strong>【医療機器非該当】</strong>本ツールは薬機法第2条第4項の「医療機器」に該当しません。<br><strong>【使用目的限定】</strong>参照・学習目的専用。診断・治療・予防を目的としません。<br><strong>【情報の正確性】</strong>掲載データは参考値です。<strong>必ず最新のIFUで確認してください。</strong><br><strong>【造影判定】</strong>造影クリアランスは理論値です。実臨床ではカテーテル位置（特にintradural/distal）、蛇行、希釈率、手押し圧、血栓性状で安全性が変化します。<br><strong>【免責】</strong>本ツール使用により生じた損害・医療事故について作成者は責任を負いません。<br><strong>【Flexor Shuttle/Ansel】</strong>Cook Medical IFU PI-D69262-JA-F (c)COOK 11/2023</div>
+</div>
+
+<div class="cs-ov" id="csOv" onclick="csClose()"></div>
+<div class="cs-panel" id="csPanel">
+  <div class="cs-head"><span class="cs-title" id="csTitle">選択</span><button class="cs-x" onclick="csClose()">✕</button></div>
+  <div class="cs-body" id="csBody"></div>
+</div>
+
+<div class="mbg" id="modDev">
+  <div class="mbox">
+    <div class="mttl" id="modTtl">NEW DEVICE</div>
+    <div style="display:flex;flex-direction:column;gap:11px">
+      <label><span class="ml">製品名</span><input id="dN" type="text" autocapitalize="none"></label>
+      <label><span class="ml">カテゴリ</span><select id="dC" class="mf"><option>DAC</option><option>吸引</option><option>マイクロ</option><option>バルーン</option><option>頭蓋内バルーン</option><option>頭蓋内ステント</option><option>頸動脈ステント</option><option>頸動脈PTAバルーン</option><option>腸骨末梢ステント</option><option>末梢PTAバルーン</option><option>冠動脈ステント</option><option>プロテクション</option></select></label>
+      <label><span class="ml">外径 O.D. (mm)</span><input id="dO" type="number" step="0.001" min="0.1" max="5" inputmode="decimal"></label>
+      <label><span class="ml">種別</span><select id="dT" class="mf"><option value="proximal">手元径 confirmed</option><option value="distal">先端径 provisional</option></select></label>
+      <label><span class="ml">備考</span><input id="dNo" type="text" autocapitalize="none"></label>
+      <label><span class="ml" style="color:#00d4ff">情報ソース</span><input id="dS" type="text" autocapitalize="none"></label>
+      <label><span class="ml" style="color:#00d4ff">登録日</span><input id="dDt" type="month"></label>
+    </div>
+    <button class="btn" onclick="saveMod()" style="margin-top:13px">保存</button>
+    <button class="btn2" onclick="closeMod()">キャンセル</button>
+  </div>
+</div>
+<div class="mbg" id="modDel">
+  <div class="mbox">
+    <div class="mttl">DELETE DEVICE</div>
+    <div id="delNm" style="font-family:monospace;font-size:.73rem;color:#e2eaf5;margin-bottom:15px"></div>
+    <button class="btn" style="background:#e05555" onclick="execDel()">削除する</button>
+    <button class="btn2" onclick="document.getElementById('modDel').style.display='none'">キャンセル</button>
+  </div>
+</div>
+
+<script>
+function goPage(id){
+  ['pgLogin','pgTx','pgMain'].forEach(p=>document.getElementById(p).style.display='none');
+  const el=document.getElementById(id);
+  el.style.display=(id==='pgLogin'||id==='pgTx')?'flex':'block';
+  window.scrollTo(0,0);
+}
+function doLogin(){
+  const ae=document.getElementById('emAg'),pe=document.getElementById('emPw');
+  ae.style.display='none';pe.style.display='none';
+  if(!document.getElementById('agCk').checked){ae.style.display='block';return;}
+  if(document.getElementById('pwIn').value==='dvx') goPage('pgTx');
+  else{pe.style.display='block';document.getElementById('pwIn').value='';}
+}
+document.addEventListener('DOMContentLoaded',()=>{
+  const pw=document.getElementById('pwIn');
+  if(pw)pw.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+  const splash=document.getElementById('bootSplash');
+  setTimeout(()=>{if(splash)splash.classList.add('hide');},950);
+  setTimeout(()=>{if(splash)splash.remove();},1650);
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('./service-worker.js', { scope: './' }).catch(()=>{});
+  }
+});
+
+/* CUSTOM SELECT */
+let _csId=null;
+function csOpen(selId,title){
+  _csId=selId;
+  document.getElementById('csTitle').textContent=title||'選択';
+  const sel=document.getElementById(selId),body=document.getElementById('csBody');
+  body.innerHTML='';
+  const curVal=sel.value;let lastGrp='';
+  Array.from(sel.options).forEach(opt=>{
+    if(opt.value===''&&opt.disabled)return;
+    const grp=opt.parentElement instanceof HTMLOptGroupElement?opt.parentElement.label:'';
+    if(grp!==lastGrp){const g=document.createElement('div');g.className='cs-grp';g.textContent=grp;body.appendChild(g);lastGrp=grp;}
+    const item=document.createElement('div');
+    item.className='cs-item'+(opt.value===curVal?' sel':'');
+    item.textContent=opt.text;
+    item.onclick=()=>csSelect(selId,opt.value,opt.text);
+    body.appendChild(item);
+  });
+  document.getElementById('csOv').classList.add('open');
+  document.getElementById('csPanel').classList.add('open');
+  setTimeout(()=>{const s=body.querySelector('.sel');if(s)s.scrollIntoView({block:'center'});else body.scrollTop=0;},60);
+}
+function csSelect(selId,value,text){
+  const sel=document.getElementById(selId),btn=document.getElementById('btn-'+selId);
+  sel.value=value;
+  if(btn){btn.textContent=text||'-- 選択 --';btn.classList.toggle('ph',!value);}
+  csClose();sel.dispatchEvent(new Event('change'));
+}
+function csClose(){document.getElementById('csOv').classList.remove('open');document.getElementById('csPanel').classList.remove('open');_csId=null;}
+function csSetOpts(selId,html,btnText){
+  const sel=document.getElementById(selId),btn=document.getElementById('btn-'+selId);
+  sel.innerHTML=html;sel.value='';
+  if(btn){btn.textContent=btnText||'-- 選択 --';btn.classList.add('ph');}
+}
+function csShowBtn(selId,show){const btn=document.getElementById('btn-'+selId);if(btn)btn.style.display=show?'block':'none';}
+
+/* GC DATABASE */
+const GC_DB={
+  shuttle8:{"name":"Flexor Shuttle 8Fr (Cook)","fr":8,"id":2.87,"id_in":0.113,"type":"Flexor Shuttle","verified":true,"src":"IFU Cook PI-D69262-JA-F","dt":"2026-04"},
+  shuttle7:{"name":"Flexor Shuttle/Ansel 7Fr (Cook)","fr":7,"id":2.54,"id_in":0.1,"type":"Flexor Shuttle","verified":true,"src":"IFU Cook PI-D69262-JA-F","dt":"2026-04"},
+  shuttle6:{"name":"Flexor Shuttle/Ansel 6Fr (Cook)","fr":6,"id":2.21,"id_in":0.087,"type":"Flexor Shuttle","verified":true,"src":"IFU Cook PI-D69262-JA-F","dt":"2026-04"},
+  shuttle5:{"name":"Flexor Shuttle/Ansel 5Fr (Cook)","fr":5,"id":1.88,"id_in":0.074,"type":"Flexor Shuttle","verified":true,"src":"IFU Cook PI-D69262-JA-F","dt":"2026-04"},
+  shuttle4:{"name":"Flexor Shuttle 4Fr (Cook)","fr":4,"id":1.511,"id_in":0.0595,"type":"Flexor Shuttle","verified":true,"src":"IFU Cook PI-D69262-JA-F","dt":"2026-04"},
+  branchor9:{"name":"Branchor X 9Fr (Asahi)","fr":9,"id":2.42,"id_in":0.095,"type":"BGC","verified":true,"src":"IFU Asahi Intecc","dt":"2026-04"},
+  optimo9:{"name":"OPTIMO 9Fr (Tokai Medical)","fr":9,"id":2.362,"id_in":0.093,"type":"BGC","verified":true,"src":"IFU Tokai Medical","dt":"2026-04"},
+  cello9lb:{"name":"Cello LB BGC 9Fr (Cerenovus)","fr":9,"id":2.311,"id_in":0.091,"type":"BGC","verified":true,"src":"IFU Cerenovus","dt":"2026-04"},
+  momaUltra9:{"name":"MOMA Ultra 9Fr (Medtronic)","fr":9,"id":2.108,"id_in":0.083,"type":"BGC","verified":true,"src":"IFU Medtronic","dt":"2026-04"},
+  emboguard8:{"name":"EMBOGUARD BGC 8Fr (Cerenovus)","fr":8,"id":2.21,"id_in":0.087,"type":"BGC","verified":true,"src":"IFU Cerenovus/J&J","dt":"2026-04"},
+  optimo8:{"name":"OPTIMO 8Fr (Tokai Medical)","fr":8,"id":2.21,"id_in":0.087,"type":"BGC","verified":true,"src":"IFU Tokai Medical","dt":"2026-04"},
+  bobby8:{"name":"BOBBY BGC 8Fr (Terumo)","fr":8,"id":2.184,"id_in":0.086,"type":"BGC","verified":true,"src":"IFU Terumo","dt":"2026-04"},
+  branchor8:{"name":"Branchor X/XF 8Fr (Asahi)","fr":8,"id":2.19,"id_in":0.086,"type":"BGC","verified":true,"src":"IFU Asahi Intecc","dt":"2026-04"},
+  flowgate2:{"name":"FlowGate2 BGC 8Fr (Stryker)","fr":8,"id":2.134,"id_in":0.084,"type":"BGC","verified":true,"src":"IFU Stryker","dt":"2026-04"},
+  cello8:{"name":"Cello LB BGC 8Fr (Cerenovus)","fr":8,"id":2.032,"id_in":0.08,"type":"BGC","verified":true,"src":"IFU Cerenovus","dt":"2026-04"},
+  momaUltra8:{"name":"MOMA Ultra 8Fr (Medtronic)","fr":8,"id":1.753,"id_in":0.069,"type":"BGC","verified":true,"src":"IFU Medtronic","dt":"2026-04"},
+  optimo7:{"name":"OPTIMO 7Fr (Tokai Medical)","fr":7,"id":1.803,"id_in":0.071,"type":"BGC","verified":true,"src":"IFU Tokai Medical","dt":"2026-04"},
+  cello7:{"name":"Cello BGC 7Fr (Cerenovus)","fr":7,"id":1.702,"id_in":0.067,"type":"BGC","verified":true,"src":"IFU Cerenovus","dt":"2026-04"},
+  optimo6:{"name":"OPTIMO 6Fr (Tokai Medical)","fr":6,"id":1.473,"id_in":0.058,"type":"BGC","verified":true,"src":"IFU Tokai Medical","dt":"2026-04"},
+  cello6:{"name":"Cello BGC 6Fr (Cerenovus)","fr":6,"id":1.295,"id_in":0.051,"type":"BGC","verified":true,"src":"IFU Cerenovus","dt":"2026-04"},
+  cello5:{"name":"Cello BGC 5Fr (Cerenovus)","fr":5,"id":0.991,"id_in":0.039,"type":"BGC","verified":true,"src":"IFU Cerenovus","dt":"2026-04"},
+  neurocompass8:{"name":"NeuroCOMPASS 8Fr (Technocrat)","fr":8,"id":2.413,"id_in":0.095,"type":"GC","verified":true,"src":"IFU Technocrat","dt":"2026-04"},
+  fubuki8:{"name":"ASAHI FUBUKI/XF 8Fr","fr":8,"id":2.286,"id_in":0.09,"type":"GC","verified":true,"src":"IFU Asahi Intecc","dt":"2026-04"},
+  roadmaster8:{"name":"ROADMASTER TH 8Fr (Nipro)","fr":8,"id":2.286,"id_in":0.09,"type":"GC","verified":true,"src":"IFU Nipro","dt":"2026-04"},
+  fubuki7:{"name":"ASAHI FUBUKI 7Fr","fr":7,"id":2.057,"id_in":0.081,"type":"GC","verified":true,"src":"IFU Asahi Intecc","dt":"2026-04"},
+  rist7:{"name":"RIST 7Fr (Medtronic)","fr":7,"id":2.007,"id_in":0.079,"type":"GC","verified":true,"src":"IFU Medtronic","dt":"2026-04"},
+  neurocompass6:{"name":"NeuroCOMPASS 6Fr (Technocrat)","fr":6,"id":1.829,"id_in":0.072,"type":"GC","verified":true,"src":"IFU Technocrat","dt":"2026-04"},
+  fubuki6:{"name":"ASAHI FUBUKI 6Fr","fr":6,"id":1.803,"id_in":0.071,"type":"GC","verified":true,"src":"IFU Asahi Intecc","dt":"2026-04"},
+  rist6:{"name":"RIST 6Fr (Medtronic)","fr":6,"id":1.524,"id_in":0.06,"type":"GC","verified":true,"src":"IFU Medtronic","dt":"2026-04"},
+  axcelguide6:{"name":"Axcelguide 6Fr (Medikit)","fr":6,"id":2.235,"id_in":0.088,"type":"Guiding Sheath","verified":true,"src":"IFU Medikit","dt":"2026-04"},
+  axcelguide5:{"name":"Axcelguide 5Fr (Medikit)","fr":5,"id":2.032,"id_in":0.08,"type":"Guiding Sheath","verified":true,"src":"IFU Medikit","dt":"2026-04"},
+  axcelguide4:{"name":"Axcelguide 4Fr (Medikit)","fr":4,"id":1.651,"id_in":0.065,"type":"Guiding Sheath","verified":true,"src":"IFU Medikit","dt":"2026-04"},
+  axcelguide3:{"name":"Axcelguide 3Fr (Medikit)","fr":3,"id":1.499,"id_in":0.059,"type":"Guiding Sheath","verified":true,"src":"IFU Medikit","dt":"2026-04"},
+};
+
+const DEV_DB={
+  vecta71_dac:{"name":"AXS Vecta 71 DAC (Stryker)","od":2.16,"type":"proximal","cat":"DAC","note":"Distal OD 2.080mm / Proximal OD 2.160mm  ID 1.800mm / 0.0710in","src":"PMDA Stryker","dt":"2026-04"},
+  navien72:{"name":"Navien 72 (Medtronic)","od":2.134,"type":"proximal","cat":"DAC","note":"OD 2.134mm  ID 1.829mm / 0.0720in","src":"IFU Medtronic","dt":"2026-04"},
+  sofiaselect6:{"name":"Sofia Select 6Fr (Terumo)","od":2.1,"type":"proximal","cat":"DAC","note":"OD 2.100mm  ID 1.780mm / 0.0700in","src":"IFU Terumo","dt":"2026-04"},
+  esperance_dac6:{"name":"Esperance DAC 6F (JLL)","od":2.08,"type":"proximal","cat":"DAC","note":"OD 2.080mm  ID 1.800mm / 0.0710in","src":"IFU JLL/Wallaby","dt":"2026-04"},
+  cat5:{"name":"Catalyst 5 DAC (Stryker)","od":1.86,"type":"proximal","cat":"DAC","note":"Distal OD 1.760mm / Proximal OD 1.860mm  ID 1.470mm / 0.0580in","src":"IFU Stryker","dt":"2026-04"},
+  navien58:{"name":"Navien 58 (Medtronic)","od":1.78,"type":"proximal","cat":"DAC","note":"OD 1.780mm  ID 1.470mm / 0.0580in","src":"IFU Medtronic","dt":"2026-04"},
+  sofiaselect5:{"name":"Sofia Select 5Fr (Terumo)","od":1.73,"type":"proximal","cat":"DAC","note":"OD 1.730mm  ID 1.400mm / 0.0550in","src":"IFU Terumo","dt":"2026-04"},
+  esperance_dac5:{"name":"Esperance DAC 5F (JLL)","od":1.68,"type":"proximal","cat":"DAC","note":"OD 1.680mm  ID 1.400mm / 0.0550in","src":"IFU JLL/Wallaby","dt":"2026-04"},
+  phenomplus:{"name":"Phenom Plus (Medtronic)","od":1.57,"type":"proximal","cat":"DAC","note":"OD 1.570mm  ID 1.130mm / 0.0445in","src":"PMDA Medtronic 30500BZX00098000","dt":"2026-04"},
+  vecta46:{"name":"AXS Vecta 46 DAC (Stryker)","od":2.03,"type":"proximal","cat":"DAC","note":"Distal OD 1.420mm / Proximal OD 2.030mm  ID 1.170mm / 0.0460in","src":"PMDA Stryker","dt":"2026-04"},
+  fubuki42fr:{"name":"FUBUKI 4.2Fr DAC (Asahi)","od":1.4,"type":"proximal","cat":"DAC","note":"OD 1.400mm  ID 1.100mm / 0.0430in","src":"IFU Asahi Intecc","dt":"2026-04"},
+  tactics:{"name":"TACTICS (Technocrat)","od":1.14,"type":"proximal","cat":"DAC","note":"OD 1.140mm  ID 0.890mm / 0.0350in","src":"IFU Technocrat","dt":"2026-04"},
+  tactics_pro:{"name":"TACTICS Pro (Technocrat)","od":1.14,"type":"proximal","cat":"DAC","note":"OD 1.140mm  ID 0.940mm / 0.0370in","src":"IFU Technocrat","dt":"2026-04"},
+  guidepost34:{"name":"Guidepost 3.4Fr (Tokai Medical)","od":1.14,"type":"proximal","cat":"DAC","note":"OD 1.140mm  ID 0.890mm / 0.0350in","src":"IFU Tokai Medical","dt":"2026-04"},
+  defrictor_zero:{"name":"DeFrictor ZERO (Medicos Hirata)","od":1.133,"type":"proximal","cat":"DAC","note":"OD 1.133mm  ID 0.890mm / 0.0350in","src":"IFU Medicos Hirata","dt":"2026-04"},
+  vecta74_asp:{"name":"AXS Vecta 74 Asp (Stryker)","od":2.21,"type":"proximal","cat":"吸引","note":"Distal OD 2.110mm / Proximal OD 2.210mm  ID 1.880mm / 0.0740in","src":"PMDA Stryker","dt":"2026-04"},
+  react71:{"name":"REACT 71 (Medtronic)","od":2.17,"type":"proximal","cat":"吸引","note":"OD 2.170mm  ID 1.800mm / 0.0710in","src":"IFU Medtronic","dt":"2026-04"},
+  red72_silver:{"name":"RED 72 Silver Label (Penumbra)","od":2.16,"type":"proximal","cat":"吸引","note":"OD 2.160mm  ID 1.830mm / 0.0720in","src":"IFU Penumbra","dt":"2026-04"},
+  red72:{"name":"RED 72 (Penumbra)","od":2.16,"type":"proximal","cat":"吸引","note":"OD 2.160mm  ID 1.830mm / 0.0720in","src":"IFU Penumbra","dt":"2026-04"},
+  vecta71:{"name":"AXS Vecta 71 Asp (Stryker)","od":2.16,"type":"proximal","cat":"吸引","note":"Distal OD 2.080mm / Proximal OD 2.160mm  ID 1.800mm / 0.0710in","src":"PMDA Stryker","dt":"2026-04"},
+  red68:{"name":"RED 68 (Penumbra)","od":2.13,"type":"proximal","cat":"吸引","note":"OD 2.130mm  ID 1.730mm / 0.0680in","src":"IFU Penumbra","dt":"2026-04"},
+  salva71:{"name":"SALVA 71 (Nipro/Goodman)","od":2.13,"type":"proximal","cat":"吸引","note":"OD 2.130mm  ID 1.800mm / 0.0710in","src":"IFU Nipro/Goodman","dt":"2026-04"},
+  salva68:{"name":"SALVA 68 (Nipro/Goodman)","od":2.13,"type":"proximal","cat":"吸引","note":"OD 2.130mm  ID 1.730mm / 0.0680in","src":"IFU Nipro/Goodman","dt":"2026-04"},
+  salva60:{"name":"SALVA 60 (Nipro/Goodman)","od":2.12,"type":"proximal","cat":"吸引","note":"OD 2.120mm  ID 1.520mm / 0.0600in","src":"IFU Nipro/Goodman","dt":"2026-04"},
+  react68:{"name":"REACT 68 (Medtronic)","od":2.11,"type":"proximal","cat":"吸引","note":"OD 2.110mm  ID 1.730mm / 0.0680in","src":"IFU Medtronic","dt":"2026-04"},
+  sofiaflow6:{"name":"SOFIAFLOW Plus 6Fr (Terumo)","od":2.11,"type":"proximal","cat":"吸引","note":"OD 2.110mm  ID 1.780mm / 0.0700in","src":"IFU Terumo","dt":"2026-04"},
+  apro70:{"name":"APRO 70 (Kaneka)","od":2.1,"type":"proximal","cat":"吸引","note":"OD 2.100mm  ID 1.780mm / 0.0700in","src":"IFU Kaneka","dt":"2026-04"},
+  cat7_asp:{"name":"Catalyst 7 Asp (Stryker)","od":2.1,"type":"proximal","cat":"吸引","note":"Distal OD 2.080mm / Proximal OD 2.100mm  ID 1.730mm / 0.0680in","src":"IFU Stryker","dt":"2026-04"},
+  cereglide71:{"name":"CEREGLIDE 71 (J&J)","od":2.126,"type":"proximal","cat":"吸引","note":"Distal OD 2.083mm(0.082in) / Proximal OD max 2.126mm(0.0837in)  ID 1.803mm / 0.0710in  ※FDA K251828準拠","src":"FDA K251828 / IFU J&J","dt":"2026-04"},
+  esperance6:{"name":"Esperance 6F Asp (JLL)","od":2.08,"type":"proximal","cat":"吸引","note":"OD 2.080mm  ID 1.800mm / 0.0710in","src":"IFU JLL/Wallaby","dt":"2026-04"},
+  red62:{"name":"RED 62 (Penumbra)","od":1.93,"type":"proximal","cat":"吸引","note":"OD 1.930mm  ID 1.570mm / 0.0620in","src":"IFU Penumbra","dt":"2026-04"},
+  cat6_asp:{"name":"Catalyst 6 Asp (Stryker)","od":2.01,"type":"proximal","cat":"吸引","note":"Distal OD 1.810mm / Proximal OD 2.010mm  ID 1.520mm / 0.0600in","src":"IFU Stryker","dt":"2026-04"},
+  cereglide57:{"name":"CEREGLIDE 57 (J&J)","od":1.73,"type":"proximal","cat":"吸引","note":"OD 1.730mm  ID 1.450mm / 0.0570in","src":"IFU J&J","dt":"2026-04"},
+  sofiaflow5:{"name":"SOFIAFLOW 5Fr (Terumo)","od":1.73,"type":"proximal","cat":"吸引","note":"OD 1.730mm  ID 1.400mm / 0.0550in","src":"IFU Terumo","dt":"2026-04"},
+  esperance5:{"name":"Esperance 5F Asp (JLL)","od":1.68,"type":"proximal","cat":"吸引","note":"OD 1.680mm  ID 1.400mm / 0.0550in","src":"IFU JLL/Wallaby","dt":"2026-04"},
+  esperance3p:{"name":"Esperance 3+ Asp (JLL)","od":1.68,"type":"proximal","cat":"吸引","note":"Shaft OD 1.680mm  ID 1.370mm / 0.0540in | Tip OD 1.270mm  ID 1.040mm / 0.0410in","src":"IFU JLL/Wallaby","dt":"2026-04"},
+  max3:{"name":"3MAX (Penumbra)","od":1.57,"type":"proximal","cat":"吸引","note":"OD 1.570mm  ID 0.890mm / 0.0350in","src":"IFU Penumbra","dt":"2026-04"},
+  red43:{"name":"RED 43 (Penumbra)","od":1.52,"type":"proximal","cat":"吸引","note":"OD 1.520mm  ID 1.090mm / 0.0430in","src":"IFU Penumbra","dt":"2026-04"},
+  vecta46_asp:{"name":"AXS Vecta 46 Asp (Stryker)","od":2.03,"type":"proximal","cat":"吸引","note":"Distal OD 1.420mm / Proximal OD 2.030mm  ID 1.170mm / 0.0460in","src":"PMDA Stryker","dt":"2026-04"},
+  salva41:{"name":"SALVA TORE 41 (Nipro/Goodman)","od":1.4,"type":"proximal","cat":"吸引","note":"OD 1.400mm  ID 1.040mm / 0.0410in","src":"IFU Nipro/Goodman","dt":"2026-04"},
+  cereglide42:{"name":"CEREGLIDE 42 (J&J)","od":1.35,"type":"proximal","cat":"吸引","note":"OD 1.350mm  ID 1.070mm / 0.0420in","src":"IFU J&J","dt":"2026-04"},
+  via33:{"name":"VIA 33 (MicroVention)","od":1.27,"type":"proximal","cat":"マイクロ","note":"先端 3.4Fr / 手元 3.8Fr (1.27mm)","src":"IFU MicroVention","dt":"2026-04"},
+  via27:{"name":"VIA 27 (MicroVention)","od":1.07,"type":"proximal","cat":"マイクロ","note":"先端 3.0Fr / 手元 3.2Fr (1.07mm)","src":"IFU MicroVention","dt":"2026-04"},
+  marksman:{"name":"Marksman (Medtronic)","od":1.07,"type":"proximal","cat":"マイクロ","note":"先端 2.8Fr / 手元 3.2Fr (1.07mm)","src":"IFU Medtronic","dt":"2026-04"},
+  headway27:{"name":"Headway Plus 27 (Terumo)","od":1.03,"type":"proximal","cat":"マイクロ","note":"先端 2.6Fr / 手元 3.1Fr (1.03mm)","src":"IFU Terumo","dt":"2026-04"},
+  xt27:{"name":"Excelsior XT-27 (Stryker)","od":0.97,"type":"proximal","cat":"マイクロ","note":"先端 2.7Fr / 手元 2.9Fr (0.97mm)","src":"IFU Stryker","dt":"2026-04"},
+  phenom27:{"name":"Phenom 27 (Medtronic)","od":0.93,"type":"proximal","cat":"マイクロ","note":"先端 2.6Fr / 手元 2.8Fr (0.93mm)","src":"IFU Medtronic","dt":"2026-04"},
+  passerelle21:{"name":"Passerelle 21 (Medicos Hirata)","od":0.93,"type":"proximal","cat":"マイクロ","note":"先端 2.2Fr / 手元 2.8Fr (0.93mm)","src":"IFU Medicos Hirata","dt":"2026-04"},
+  via21:{"name":"VIA 21 (MicroVention)","od":0.93,"type":"proximal","cat":"マイクロ","note":"先端 2.5Fr / 手元 2.8Fr (0.93mm)","src":"IFU MicroVention","dt":"2026-04"},
+  phenom21:{"name":"Phenom 21 (Medtronic)","od":0.87,"type":"proximal","cat":"マイクロ","note":"先端 2.1Fr / 手元 2.6Fr (0.87mm)","src":"IFU Medtronic","dt":"2026-04"},
+  headway21:{"name":"Headway Plus 21 (Terumo)","od":0.83,"type":"proximal","cat":"マイクロ","note":"先端 2.0Fr / 手元 2.5Fr (0.83mm)","src":"IFU Terumo","dt":"2026-04"},
+  carry_slim25:{"name":"Carry Slim Leon 2.5Fr (UTM)","od":0.83,"type":"proximal","cat":"マイクロ","note":"先端 1.9Fr / 手元 2.5Fr (0.83mm)","src":"IFU UTM","dt":"2026-04"},
+  rebar18:{"name":"Rebar 18 (Medtronic)","od":0.93,"type":"proximal","cat":"マイクロ","note":"先端 2.3Fr / 手元 2.8Fr (0.93mm)","src":"IFU Medtronic","dt":"2026-04"},
+  ex1018:{"name":"Excelsior 1018 (Stryker)","od":0.87,"type":"proximal","cat":"マイクロ","note":"先端 1.7Fr / 手元 2.6Fr (0.87mm)","src":"IFU Stryker","dt":"2026-04"},
+  greach17:{"name":"GREACH 0.0165in (Tokai Medical)","od":0.8,"type":"proximal","cat":"マイクロ","note":"先端 1.7Fr / 手元 2.4Fr (0.80mm)","src":"IFU Tokai Medical","dt":"2026-04"},
+  sl10:{"name":"Excelsior SL-10 (Stryker)","od":0.8,"type":"proximal","cat":"マイクロ","note":"先端 1.7Fr / 手元 2.4Fr (0.80mm)","src":"IFU Stryker","dt":"2026-04"},
+  headway17:{"name":"Headway 17 (Terumo)","od":0.8,"type":"proximal","cat":"マイクロ","note":"先端 1.7Fr / 手元 2.4Fr (0.80mm)","src":"IFU Terumo","dt":"2026-04"},
+  phenom17:{"name":"Phenom 17 (Medtronic)","od":0.73,"type":"proximal","cat":"マイクロ","note":"先端 1.8Fr / 手元 2.2Fr (0.73mm)","src":"IFU Medtronic","dt":"2026-04"},
+  defrictor_nano:{"name":"DeFrictor Nano (Medicos Hirata)","od":0.73,"type":"proximal","cat":"マイクロ","note":"先端 1.3Fr / 手元 2.2Fr (0.73mm)","src":"IFU Medicos Hirata","dt":"2026-04"},
+  defrictor_bull:{"name":"DeFrictor BULL (Medicos Hirata)","od":0.8,"type":"proximal","cat":"マイクロ","note":"先端 1.5Fr / 手元 2.4Fr (0.80mm)","src":"IFU Medicos Hirata","dt":"2026-04"},
+  headway_duo:{"name":"Headway Duo (Terumo)","od":0.7,"type":"proximal","cat":"マイクロ","note":"先端 1.6Fr / 手元 2.1Fr (0.70mm)","src":"IFU Terumo","dt":"2026-04"},
+  marathon:{"name":"Marathon (Medtronic)","od":0.9,"type":"proximal","cat":"マイクロ","note":"先端 1.5Fr / 手元 2.7Fr (0.90mm)","src":"IFU Medtronic","dt":"2026-04"},
+  magic18:{"name":"Magic 1.8F (Balt)","od":0.67,"type":"proximal","cat":"マイクロ","note":"先端 1.8Fr / 手元 2.0Fr (0.67mm)","src":"IFU Balt","dt":"2026-04"},
+  magic15:{"name":"Magic 1.5F (Balt)","od":0.57,"type":"proximal","cat":"マイクロ","note":"先端 1.5Fr / 手元 1.7Fr (0.57mm)","src":"IFU Balt","dt":"2026-04"},
+  scout_cat:{"name":"Scout (Stryker)","od":1.47,"type":"proximal","cat":"マイクロ","note":"先端 2.4Fr / 手元 4.4Fr (1.47mm)","src":"PMDA Stryker","dt":"2026-04"},
+  leonishf:{"name":"Leonis Mover HF 2.9Fr (SB)","od":0.97,"type":"proximal","cat":"マイクロ","note":"先端 2.9Fr / 手元 2.9Fr (0.97mm)","src":"PMDA Sumitomo Bakelite","dt":"2026-04"},
+  leonisst:{"name":"Leonis Mover ST (SB)","od":0.8,"type":"proximal","cat":"マイクロ","note":"先端 2.4Fr / 手元 2.4Fr (0.80mm)","src":"PMDA Sumitomo Bakelite","dt":"2026-04"},
+  leonisst_gw:{"name":"Leonis Mover ST GW (SB)","od":0.8,"type":"proximal","cat":"マイクロ","note":"先端 2.4Fr / 手元 2.4Fr (0.80mm)","src":"PMDA Sumitomo Bakelite","dt":"2026-04"},
+  leonisst_s:{"name":"Leonis Mover SL 2.0Fr (SB)","od":0.67,"type":"proximal","cat":"マイクロ","note":"先端 2.0Fr / 手元 2.0Fr (0.67mm)","src":"PMDA Sumitomo Bakelite","dt":"2026-04"},
+  carry_leon_nsx:{"name":"Carry Leon NSX (UTM)","od":0.63,"type":"proximal","cat":"マイクロ","note":"先端 1.9Fr / 手元 1.9Fr (0.63mm)","src":"IFU UTM","dt":"2026-04"},
+  carry_slim17:{"name":"Carry Slim Leon 1.7Fr (UTM)","od":0.57,"type":"proximal","cat":"マイクロ","note":"先端 1.4Fr / 手元 1.7Fr (0.57mm)","src":"IFU UTM","dt":"2026-04"},
+  wonder3:{"name":"Wonder3 (UTM)","od":0.8,"type":"proximal","cat":"マイクロ","note":"先端 1.6Fr / 手元 2.4Fr (0.80mm)","src":"IFU UTM","dt":"2026-04"},
+  transform_sc:{"name":"TransForm SC (Stryker)","od":0.93,"type":"proximal","cat":"バルーン","note":"OD 0.930mm (2.8Fr)","src":"IFU Stryker","dt":"2026-04"},
+  transform_oc:{"name":"TransForm OC (Stryker)","od":0.93,"type":"proximal","cat":"バルーン","note":"OD 0.930mm (2.8Fr)","src":"IFU Stryker","dt":"2026-04"},
+  scepter:{"name":"Scepter C/XC (Terumo)","od":0.93,"type":"proximal","cat":"バルーン","note":"OD 0.930mm (2.8Fr)","src":"IFU Terumo","dt":"2026-04"},
+  hyperform:{"name":"HyperForm 4/7mm (Medtronic)","od":0.93,"type":"proximal","cat":"バルーン","note":"OD 0.930mm (2.8Fr)","src":"IFU Medtronic","dt":"2026-04"},
+  hyperglide:{"name":"HyperGlide 4/6mm (Medtronic)","od":0.9,"type":"proximal","cat":"バルーン","note":"OD 0.900mm (2.7Fr)","src":"IFU Medtronic","dt":"2026-04"},
+  shouryu:{"name":"SHOURYU (Kaneka)","od":0.9,"type":"proximal","cat":"バルーン","note":"OD 0.900mm (2.7Fr)","src":"IFU Kaneka","dt":"2026-04"},
+  gateway_mr:{"name":"Gateway Monorail (BSC)","od":1.2,"type":"proximal","cat":"頭蓋内バルーン","note":"effective OD 1.200mm / shaft 1.070mm + GW 0.014in 併走の保守判定","src":"Audit v10 conservative / literature","dt":"2026-04"},
+  unryu:{"name":"雲竜 XP (Kaneka)","od":1.00,"tip_od":0.83,"shaft_od":0.63,"type":"distal","cat":"頭蓋内バルーン","note":"Tip 2.5Fr(0.83mm) / Prox 1.9Fr(0.63mm) ⚠GW並走(実効約1.0mm)","src":"IFU Kaneka (May 2021)","dt":"2026-04"},
+  gateway_otw:{"name":"Gateway OTW (BSC)","od":1.07,"type":"proximal","cat":"頭蓋内バルーン","note":"OD 1.070mm (shaft 3.2Fr / tip 0.84mm / GW<=0.014in)","src":"FDA H050001 + audit v10","dt":"2026-04"},
+  wingspan:{"name":"Wingspan (Stryker)","od":1.53,"type":"proximal","cat":"頭蓋内ステント","note":"OD 1.530mm (4.6Fr)","src":"IFU Stryker","dt":"2026-04"},
+  casper_rx:{"name":"CASPER Rx (Terumo)","od":1.67,"type":"proximal","cat":"頸動脈ステント","note":"OD 1.670mm (5.0Fr)","src":"IFU Terumo","dt":"2026-04"},
+  precise_pro6:{"name":"PRECISE PRO RX 8-10mm (Cordis)","od":2.0,"type":"proximal","cat":"頸動脈ステント","note":"OD 2.000mm (6.0Fr)","src":"IFU Cordis","dt":"2026-04"},
+  precise_pro5:{"name":"PRECISE PRO RX 6-7mm (Cordis)","od":1.67,"type":"proximal","cat":"頸動脈ステント","note":"OD 1.670mm (5.0Fr)","src":"IFU Cordis","dt":"2026-04"},
+  protege_rx:{"name":"Protege RX (Medtronic)","od":2.0,"type":"proximal","cat":"頸動脈ステント","note":"OD 2.000mm (6.0Fr)","src":"IFU Medtronic","dt":"2026-04"},
+  wallstent_5:{"name":"Carotid WALLSTENT 6-8mm (BSC)","od":1.67,"type":"proximal","cat":"頸動脈ステント","note":"OD 1.670mm (5.0Fr)","src":"IFU Boston Scientific","dt":"2026-04"},
+  wallstent_6:{"name":"Carotid WALLSTENT 10mm (BSC)","od":2.0,"type":"proximal","cat":"頸動脈ステント","note":"OD 2.000mm (6.0Fr)","src":"IFU Boston Scientific","dt":"2026-04"},
+  aviator_plus:{"name":"Aviator Plus (Cordis)","od":1.1,"type":"proximal","cat":"頸動脈PTAバルーン","note":"OD 1.100mm (3.3Fr)","src":"IFU Cordis","dt":"2026-04"},
+  sterling_mr:{"name":"Sterling Monorail (BSC)","od":1.33,"type":"proximal","cat":"頸動脈PTAバルーン","note":"OD 1.330mm (4.0Fr)","src":"IFU Boston Scientific","dt":"2026-04"},
+  genity:{"name":"Rx-Genity/EX (Kaneka)","od":1.27,"type":"proximal","cat":"頸動脈PTAバルーン","note":"OD 1.270mm (3.8Fr)","src":"IFU Kaneka","dt":"2026-04"},
+  admiral_7:{"name":"Admiral Xtreme 12mm 7Fr (Medtronic)","od":2.33,"type":"proximal","cat":"末梢PTAバルーン","note":"OD 2.330mm (7.0Fr)","src":"IFU Medtronic","dt":"2026-04"},
+  admiral_6:{"name":"Admiral Xtreme 8-10mm 6Fr (Medtronic)","od":2.0,"type":"proximal","cat":"末梢PTAバルーン","note":"OD 2.000mm (6.0Fr)","src":"IFU Medtronic","dt":"2026-04"},
+  admiral_5:{"name":"Admiral Xtreme 4-7mm 5Fr (Medtronic)","od":1.67,"type":"proximal","cat":"末梢PTAバルーン","note":"OD 1.670mm (5.0Fr)","src":"IFU Medtronic","dt":"2026-04"},
+  mustang:{"name":"Mustang (BSC)","od":1.67,"type":"proximal","cat":"末梢PTAバルーン","note":"OD 1.670mm (5.0Fr)","src":"IFU Boston Scientific","dt":"2026-04"},
+  sterling_otw:{"name":"Sterling OTW (BSC)","od":1.33,"type":"proximal","cat":"末梢PTAバルーン","note":"OD 1.330mm (4.0Fr)","src":"IFU Boston Scientific","dt":"2026-04"},
+  smart_ctrl_7:{"name":"SMART CONTROL 12-14mm 7Fr","od":2.33,"type":"proximal","cat":"腸骨末梢ステント","note":"OD 2.330mm (7.0Fr)","src":"IFU Cordis","dt":"2026-04"},
+  smart_ctrl_6:{"name":"SMART CONTROL 6-10mm 6Fr","od":2.0,"type":"proximal","cat":"腸骨末梢ステント","note":"OD 2.000mm (6.0Fr)","src":"IFU Cordis","dt":"2026-04"},
+  protege_gps:{"name":"Protege GPS (Medtronic)","od":2.0,"type":"proximal","cat":"腸骨末梢ステント","note":"OD 2.000mm (6.0Fr)","src":"IFU Medtronic","dt":"2026-04"},
+  everflex:{"name":"EverFlex (Medtronic)","od":1.67,"type":"proximal","cat":"腸骨末梢ステント","note":"OD 1.670mm (5.0Fr)","src":"IFU Medtronic","dt":"2026-04"},
+  palmaz_gen:{"name":"Palmaz Genesis (Cordis)","od":1.1,"type":"proximal","cat":"腸骨末梢ステント","note":"OD 1.100mm (3.3Fr)","src":"IFU Cordis","dt":"2026-04"},
+  xience_sp:{"name":"XIENCE Skypoint (Abbott)","od":1.33,"type":"proximal","cat":"冠動脈ステント","note":"OD 1.330mm (4.0Fr)","src":"IFU Abbott","dt":"2026-04"},
+  xience_exp:{"name":"XIENCE Expedition (Abbott)","od":1.33,"type":"proximal","cat":"冠動脈ステント","note":"OD 1.330mm (4.0Fr)","src":"IFU Abbott","dt":"2026-04"},
+  optimalwire:{"name":"Optimal Wire Protection (Tokai Medical)","od":0.356,"type":"proximal","cat":"プロテクション","note":"OD 0.356mm (0.014in)","src":"IFU Tokai Medical","dt":"2026-04"},
+  protcasgw:{"name":"Protcas GW (Medtronic)","od":0.356,"type":"proximal","cat":"プロテクション","note":"OD 0.356mm (0.014in)","src":"IFU Medtronic","dt":"2026-04"},
+};
+
+const GW_DB={
+  gw035:{"name":"GW 0.035in","od":0.889,"src":"ref IFU","dt":"2026-04"},
+  gw018:{"name":"GW 0.018in","od":0.457,"src":"ref IFU","dt":"2026-04"},
+  gw016:{"name":"GW 0.016in","od":0.406,"src":"ref IFU","dt":"2026-04"},
+  chikai014:{"name":"CHIKAI 014 (Asahi)","od":0.356,"src":"IFU Asahi Intecc","dt":"2026-04"},
+  synchro014:{"name":"Synchro SELECT 0.014in (Stryker)","od":0.356,"src":"IFU Stryker","dt":"2026-04"},
+  tenrou014:{"name":"TENROU 014 (JLL)","od":0.356,"src":"PMDA 日本ライフライン 22200BZX00671A01","dt":"2026-04"},
+  gw014:{"name":"GW 0.014in","od":0.356,"src":"ref IFU","dt":"2026-04"},
+  chikai010:{"name":"CHIKAI X 010 (Asahi)","od":0.254,"src":"IFU Asahi Intecc","dt":"2026-04"},
+  chikai008:{"name":"CHIKAI 008 (Asahi)","od":0.203,"src":"IFU Asahi Intecc","dt":"2026-04"},
+};
+
+const TX_LBL={aneurysm:'Aneurysm / CSDH / AVM / AVF',ais:'AIS / ICPTA / ICS',cas:'CAS / VAS / SAS'};
+const TX_DEV={
+  aneurysm:new Set(["sofiaselect6","sofiaselect5","navien72","navien58","vecta71_dac","vecta46","cat5","phenomplus","tactics","tactics_pro","guidepost34","fubuki42fr","defrictor_zero","esperance_dac6","esperance_dac5","via33","phenom27","marksman","via27","headway27","xt27","via21","phenom21","phenom17","headway21","sl10","headway17","headway_duo","ex1018","rebar18","greach17","passerelle21","defrictor_nano","defrictor_bull","wonder3","carry_slim17","carry_slim25","carry_leon_nsx","magic18","magic15","marathon","leonisst","leonisst_s","leonishf","leonisst_gw","transform_sc","transform_oc","scepter","hyperform","hyperglide","shouryu","scout_cat"]),
+  ais:new Set(["sofiaselect6","sofiaselect5","navien72","navien58","vecta71_dac","vecta46","cat5","phenomplus","tactics","tactics_pro","guidepost34","fubuki42fr","defrictor_zero","esperance_dac6","esperance_dac5","red72_silver","red72","vecta74_asp","vecta71","cat7_asp","cat6_asp","vecta46_asp","max3","react71","red68","react68","sofiaflow6","apro70","cereglide71","cereglide57","cereglide42","esperance6","esperance5","esperance3p","red62","sofiaflow5","red43","salva71","salva68","salva60","salva41","scout_cat","via21","phenom21","phenom17","headway21","sl10","headway17","headway_duo","ex1018","rebar18","greach17","passerelle21","defrictor_nano","defrictor_bull","leonisst","leonisst_s","leonishf","leonisst_gw","gateway_otw","gateway_mr","unryu","wingspan"]),
+  cas:new Set(["aviator_plus","sterling_mr","sterling_otw","admiral_5","admiral_6","admiral_7","mustang","casper_rx","smart_ctrl_6","smart_ctrl_7","everflex","protege_gps","palmaz_gen","precise_pro5","precise_pro6","protege_rx","wallstent_5","wallstent_6","wingspan","gateway_otw","gateway_mr","unryu","xience_sp","xience_exp","genity","optimalwire","protcasgw"]),
+};
+const CAT_ORDER=['DAC','吸引','マイクロ','バルーン','頭蓋内バルーン','頭蓋内ステント','頸動脈ステント','頸動脈PTAバルーン','腸骨末梢ステント','末梢PTAバルーン','冠動脈ステント','プロテクション'];
+const TYPE_COL={'Flexor Shuttle':'#2dd4bf','BGC':'#ff9f7a','GC':'#00d4ff','Guiding Sheath':'#7fd4ff'};
+const TYPE_LBL={'Flexor Shuttle':'Flexor Shuttle/Ansel (Cook)','BGC':'BGC','GC':'GC','Guiding Sheath':'Guiding Sheath'};
+
+/* MATH */
+function mEnc(rs){
+  const r=rs.filter(x=>x>0);if(!r.length)return 0;if(r.length===1)return r[0];
+  function pts(rs2){const p=[{x:0,y:0}];if(rs2.length<2)return p;p.push({x:rs2[0]+rs2[1],y:0});if(rs2.length<3)return p;const d01=rs2[0]+rs2[1],d02=rs2[0]+rs2[2],d12=rs2[1]+rs2[2];const ca=(d01*d01+d02*d02-d12*d12)/(2*d01*d02),sa=Math.sqrt(Math.max(0,1-ca*ca));p.push({x:d02*ca,y:d02*sa});return p;}
+  const s=[...r].sort((a,b)=>b-a),P=pts(s);
+  let ox=P.reduce((a,p)=>a+p.x,0)/P.length,oy=P.reduce((a,p)=>a+p.y,0)/P.length;
+  for(let step=1;step>1e-7;step*=0.999){const cur=P.reduce((m,p,i)=>Math.max(m,Math.sqrt((ox-p.x)**2+(oy-p.y)**2)+s[i]),0);let bx=ox,by=oy,best=cur;for(const[dx,dy]of[[step,0],[-step,0],[0,step],[0,-step]]){const nx=ox+dx,ny=oy+dy,v=P.reduce((m,p,i)=>Math.max(m,Math.sqrt((nx-p.x)**2+(ny-p.y)**2)+s[i]),0);if(v<best){best=v;bx=nx;by=ny;}}ox=bx;oy=by;}
+  return P.reduce((m,p,i)=>Math.max(m,Math.sqrt((ox-p.x)**2+(oy-p.y)**2)+s[i]),0);
+}
+function fits(radii,R){if(!radii.length)return true;if(mEnc(radii)>=R)return false;const s=[...radii].sort((a,b)=>b-a),res=R-s[0];for(let i=1;i<s.length;i++)if(s[i]>res)return false;return true;}
+function cjudge(cl){const ci=cl/25.4;if(ci>=0.025)return{ic:'◎',lb:'造影余裕ありの目安',ad:'低圧・手押しで慎重に確認',vc:'#4fffb0',bg:'rgba(79,255,176,0.08)'};if(ci>=0.015)return{ic:'△',lb:'条件付きで造影可能',ad:'希釈 / ゆっくり / distal注意',vc:'#ff9f1c',bg:'rgba(255,159,28,0.08)'};if(ci>=0)return{ic:'×',lb:'原則厳しい',ad:'別ルート・位置調整を検討',vc:'#ff4d6d',bg:'rgba(255,77,109,0.08)'};return{ic:'!!',lb:'デバイス超過',ad:'この外管に通せません',vc:'#ff4d6d',bg:'rgba(255,77,109,0.08)'};}
+function srcC(s){if(!s)return'#5a7a9a';if(s.startsWith('PMDA'))return'#4fffb0';if(s.startsWith('IFU'))return'#7fd4ff';return'#5a7a9a';}
+function drawCV(id,Rg,radii,mg){
+  const cv=document.getElementById(id);if(!cv)return;
+  const ctx=cv.getContext('2d'),W=cv.width,H=cv.height,CX=W/2,CY=H/2,sc=(W/2*.82)/Rg;
+  ctx.clearRect(0,0,W,H);ctx.fillStyle='#0a0e14';ctx.fillRect(0,0,W,H);
+  const vc=mg>=0.15?'rgba(79,255,176,.9)':mg>=0.01?'rgba(255,159,28,.9)':'rgba(255,77,109,.9)';
+  ctx.beginPath();ctx.arc(CX,CY,Rg*sc,0,Math.PI*2);ctx.strokeStyle='rgba(0,212,255,.85)';ctx.lineWidth=1.8;ctx.stroke();
+  const ST=[{f:'rgba(255,100,50,.22)',s:'#ff7040'},{f:'rgba(50,220,170,.22)',s:'#32dcaa'},{f:'rgba(192,132,252,.22)',s:'#c084fc'}];
+  function dc(cx,cy,r,fi,si,lb){const px=Math.max(r*sc,2);ctx.beginPath();ctx.arc(cx,cy,px,0,Math.PI*2);ctx.fillStyle=fi;ctx.fill();ctx.strokeStyle=vc;ctx.lineWidth=1.5;ctx.stroke();if(px>8){ctx.fillStyle=si;ctx.font='bold '+Math.min(10,Math.floor(px*.75))+'px monospace';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(lb,cx,cy);}}
+  if(!radii.length){ctx.fillStyle='rgba(0,212,255,.04)';ctx.beginPath();ctx.arc(CX,CY,Rg*sc,0,Math.PI*2);ctx.fill();}
+  else if(radii.length===1)dc(CX,CY,radii[0],ST[0].f,ST[0].s,'A');
+  else if(radii.length===2){dc(CX-radii[1]*sc,CY,radii[0],ST[0].f,ST[0].s,'A');dc(CX+radii[0]*sc,CY,radii[1],ST[1].f,ST[1].s,'B');}
+  else{const Re=mEnc(radii),[r1,r2,r3]=radii,bx=r1+r2,da=r1+r3,db=r2+r3,ox=bx>1e-9?((Re-r1)**2-(Re-r2)**2+bx*bx)/(2*bx):0,oysq=(Re-r1)**2-ox**2,oy=oysq>=0?-Math.sqrt(oysq):0,cosC=(bx*bx+da*da-db*db)/(2*bx*da),cx3=da*cosC,cy3=-da*Math.sqrt(Math.max(0,1-cosC*cosC));dc(CX+(0-ox)*sc,CY+(0-oy)*sc,r1,ST[0].f,ST[0].s,'A');dc(CX+(bx-ox)*sc,CY+(0-oy)*sc,r2,ST[1].f,ST[1].s,'B');dc(CX+(cx3-ox)*sc,CY+(cy3-oy)*sc,r3,ST[2].f,ST[2].s,'C');}
+}
+
+/* HELPERS */
+let curTX=null;
+function devListForTx(){
+  const al=TX_DEV[curTX];const ds=[];
+  CAT_ORDER.forEach(cat=>{Object.entries(DEV_DB).filter(([k,d])=>d.cat===cat&&(!al||al.has(k))).sort((a,b)=>b[1].od-a[1].od).forEach(([k,d])=>ds.push({...d,key:k}));});
+  const gws=Object.entries(GW_DB).map(([k,d])=>({...d,key:k,cat:'GW',type:'proximal'}));
+  return[...ds,...gws];
+}
+function buildGcAll(){
+  const all={};Object.entries(GC_DB).forEach(([k,d])=>{all[k]=d;});
+  Object.entries(DEV_DB).filter(([k,d])=>d.cat==='DAC'||d.cat==='吸引').forEach(([k,d])=>{
+    const m=(d.note||'').match(/ID\s+(?:[0-9.]+mm\()?([0-9.]+)in/);if(!m)return;
+    const id_in=parseFloat(m[1]),id=id_in*25.4;
+    all['dac:'+k]={name:d.name,id,id_in,type:d.cat,verified:d.type==='proximal',note:d.note,src:d.src,dt:d.dt};
+  });
+  return all;
+}
+function gcSelHTML(inclDAC){
+  const tps=inclDAC?['Flexor Shuttle','BGC','GC','Guiding Sheath','DAC','吸引']:['Flexor Shuttle','BGC','GC','Guiding Sheath'];
+  let h='<option value="" disabled selected></option>';
+  tps.forEach(t=>{
+    let items;
+    if(t==='DAC'||t==='吸引'){const ga=buildGcAll();items=Object.entries(ga).filter(([k,d])=>d.type===t).sort((a,b)=>b[1].id-a[1].id).map(([k,d])=>({key:k,...d}));}
+    else items=Object.entries(GC_DB).filter(([k,d])=>d.type===t).sort((a,b)=>b[1].id-a[1].id).map(([k,d])=>({key:k,...d}));
+    if(!items.length)return;
+    h+='<optgroup label="'+(TYPE_LBL[t]||t)+'">';
+    items.forEach(d=>{h+='<option value="'+d.key+'">'+d.name+' -- '+d.id_in.toFixed(4)+'in / '+d.id.toFixed(3)+'mm</option>';});
+    h+='</optgroup>';
+  });
+  return h;
+}
+function devSelHTML(list){
+  let h='<option value="" disabled selected></option>';
+  CAT_ORDER.forEach(cat=>{
+    const items=list.filter(d=>d.cat===cat).sort((a,b)=>b.od-a.od);if(!items.length)return;
+    h+='<optgroup label="'+cat+'">';
+    items.forEach(d=>{h+='<option value="'+d.key+'">'+d.name+' -- '+d.od.toFixed(3)+'mm ('+( d.od/.333).toFixed(1)+'Fr)</option>';});
+    h+='</optgroup>';
+  });
+  const gws=list.filter(d=>d.cat==='GW').sort((a,b)=>b.od-a.od);
+  if(gws.length){h+='<optgroup label="GW">';gws.forEach(d=>{h+='<option value="'+d.key+'">'+d.name+' -- '+d.od.toFixed(3)+'mm</option>';});h+='</optgroup>';}
+  return h;
+}
+function gcFromK(k){if(!k)return null;if(GC_DB[k])return{...GC_DB[k],key:k};if(k.startsWith('dac:')){const dk=k.slice(4),d=DEV_DB[dk];if(!d)return null;const m=(d.note||'').match(/ID\s+(?:[0-9.]+mm\()?([0-9.]+)in/);if(!m)return null;const id_in=parseFloat(m[1]),id=id_in*25.4;return{key:k,name:d.name,id,id_in,type:d.cat,verified:d.type==='proximal',src:d.src,dt:d.dt};}return null;}
+function devFromK(k){if(!k)return null;if(DEV_DB[k])return{...DEV_DB[k],key:k};if(GW_DB[k])return{...GW_DB[k],key:k,cat:'GW',type:'proximal'};return null;}
+function chip(id,html){const el=document.getElementById(id);if(!el)return;if(html){el.innerHTML=html;el.classList.add('on');}else{el.innerHTML='';el.classList.remove('on');}}
+function lck(id,lk){const el=document.getElementById(id);if(!el)return;el.classList.toggle('off',lk);el.classList.toggle('on',!lk);}
+function showDevBtn(btnId,ndId,cnt){const btn=document.getElementById(btnId),nd=document.getElementById(ndId);if(btn)btn.style.display=cnt?'block':'none';if(nd)nd.style.display=cnt?'none':'block';}
+function gcChip(d){return'<div class="cr"><span class="ck">I.D.</span><span class="cv">'+d.id_in.toFixed(4)+'in / '+d.id.toFixed(3)+'mm</span></div><div class="cr"><span class="ck">種別</span><span style="color:'+(TYPE_COL[d.type]||'#00d4ff')+';font-size:.59rem">'+d.type+'</span><span class="'+(d.verified?'co':'cw')+'">'+(d.verified?'confirmed':'unconfirmed')+'</span></div>'+(d.src?'<div class="cr"><span class="ck">src</span><span style="color:'+srcC(d.src)+';font-size:.58rem">'+d.src+'</span></div>':'');}
+const MONORAIL_KEYS=new Set(['gateway_mr','unryu','shouryu','hyperform','hyperglide','transform_sc','transform_oc']);
+function devChip(d){const warn=MONORAIL_KEYS.has(d.key)?'<div style="margin-top:7px;padding:9px 10px;background:rgba(255,77,109,0.08);border:1px solid rgba(255,77,109,0.5);border-radius:6px;font-family:\'DM Mono\',monospace;font-size:.60rem;color:#ff4d6d;line-height:1.9">⚠ モノレール構造：GW(0.014in / 0.356mm)が外管内腔に横走するため、実際の占有幅は外径＋GW分となります。収容可と表示されていても挿入できない場合があります。実際の組み合わせで通過性を確認してください。</div>':'';return'<div class="cr"><span class="ck">O.D.</span><span class="cv">'+d.od.toFixed(3)+'mm ('+( d.od/.333).toFixed(1)+'Fr)</span></div><div class="cr"><span class="ck">cat</span><span style="color:#00d4ff;font-size:.59rem">'+d.cat+'</span></div>'+(d.note?'<div class="cr"><span class="ck">note</span><span style="color:#5a7a9a;font-size:.58rem">'+d.note+'</span></div>':'')+(d.src?'<div class="cr"><span class="ck">src</span><span style="color:'+srcC(d.src)+';font-size:.58rem">'+d.src+'</span></div>':'')+warn;}
+function cvBox(bId,tId,gc,devs){
+  const gcId=gc.id,radii=devs.map(d=>d.od/2),encD=radii.length?mEnc(radii)*2:0,cl=gcId-encD,j=cjudge(cl),ci=cl/25.4;
+  const box=document.getElementById(bId);
+  if(box){box.style.cssText='background:'+j.bg+';border:1px solid '+j.vc+';border-radius:6px;padding:11px;text-align:center;margin-bottom:10px';box.innerHTML='<div class="ci" style="color:'+j.vc+'">'+j.ic+'</div><div class="cl2" style="color:'+j.vc+'">'+j.lb+'</div><div class="ca" style="color:'+j.vc+'">'+j.ad+'</div>';}
+  let r='<tr><td class="cdk">外管 I.D.</td><td class="cdv">'+gcId.toFixed(3)+'mm / '+(gcId/25.4).toFixed(4)+'in</td></tr>';
+  if(devs.length)r+='<tr><td class="cdk">包絡円径</td><td class="cdv">'+encD.toFixed(3)+'mm</td></tr>';
+  r+='<tr><td class="cdk"><b>造影クリアランス</b></td><td class="cdv"><span style="color:'+j.vc+';font-weight:700">'+(cl>=0?'+':'')+cl.toFixed(3)+'mm / '+(ci>=0?'+':'')+ci.toFixed(4)+'in</span></td></tr>';
+  const t=document.getElementById(tId);if(t)t.innerHTML=r;return{cl,j};
+}
+
+/* TREATMENT */
+function selTx(tx){
+  curTX=tx;document.getElementById('atVal').textContent=TX_LBL[tx];
+  cRST();fRST();xRST();
+  document.getElementById('cGC').innerHTML=gcSelHTML(true);
+  document.getElementById('xGC').innerHTML=gcSelHTML(true);
+  const dl=devListForTx();
+  document.getElementById('fDA').innerHTML=devSelHTML(dl);
+  document.getElementById('fCA').textContent=dl.length;
+  swTab(0);goPage('pgMain');
+}
+function swTab(i){[0,1,2,3].forEach(j=>{document.getElementById('tp'+j).classList.toggle('on',j===i);document.getElementById('tb'+j).classList.toggle('on',j===i);});if(i===3)renderSpecs();}
+
+/* CHECKER */
+let cGC=null,cA=null,cB=null,cC=null;
+function cONgc(){
+  const k=document.getElementById('cGC').value;if(!k){cGC=null;chip('cGCch',null);lck('cs2',true);cUPD();return;}
+  cGC=gcFromK(k);cA=cB=cC=null;chip('cGCch',cGC?gcChip(cGC):null);lck('cs2',!cGC);
+  if(cGC){const R=cGC.id/2,dl=devListForTx().filter(d=>d.od/2<R);document.getElementById('cDA').innerHTML=devSelHTML(dl);showDevBtn('btn-cDA','cNA',dl.length);document.getElementById('cCA').textContent=dl.length;const btn=document.getElementById('btn-cDA');if(btn){btn.textContent='-- なし（GCのみ）--';btn.classList.add('ph');}}
+  ['cDB','cDC'].forEach(id=>document.getElementById(id).innerHTML='<option value="" disabled selected></option>');
+  ['btn-cDB','btn-cDC'].forEach(id=>{const b=document.getElementById(id);if(b){b.style.display='none';b.textContent='-- なし --';b.classList.add('ph');}});
+  ['cNB','cNC'].forEach(id=>document.getElementById(id).style.display='none');
+  ['cCB','cCC'].forEach(id=>document.getElementById(id).textContent='0');
+  ['cDAch','cDBch','cDCch'].forEach(id=>chip(id,null));
+  lck('cs3',true);lck('cs4',true);cUPD();
+}
+function cONa(){
+  cA=devFromK(document.getElementById('cDA').value);cB=cC=null;
+  chip('cDAch',cA?devChip(cA):null);chip('cDBch',null);chip('cDCch',null);lck('cs3',!cGC);
+  if(cGC){const R=cGC.id/2,dl=devListForTx(),rA=cA?cA.od/2:0;const al=cA?dl.filter(d=>{const rB=d.od/2;return rA+rB<=R&&fits([rA,rB],R);}):dl.filter(d=>d.od/2<=R-0.005);document.getElementById('cDB').innerHTML=devSelHTML(al);document.getElementById('cCB').textContent=al.length;showDevBtn('btn-cDB','cNB',al.length);const b=document.getElementById('btn-cDB');if(b){b.textContent='-- なし --';b.classList.add('ph');}}
+  document.getElementById('cDC').innerHTML='<option value="" disabled selected></option>';document.getElementById('cCC').textContent='0';chip('cDCch',null);
+  const b=document.getElementById('btn-cDC');if(b){b.style.display='none';b.textContent='-- なし --';b.classList.add('ph');}
+  lck('cs4',true);cUPD();
+}
+function cONb(){
+  cB=devFromK(document.getElementById('cDB').value);cC=null;chip('cDBch',cB?devChip(cB):null);chip('cDCch',null);lck('cs4',!cGC);
+  if(cGC){const R=cGC.id/2,existing=[cA,cB].filter(Boolean).map(d=>d.od/2),dl=devListForTx();const al=existing.length?dl.filter(d=>fits([...existing,d.od/2],R)):dl.filter(d=>d.od/2<=R-0.005);document.getElementById('cDC').innerHTML=devSelHTML(al);document.getElementById('cCC').textContent=al.length;showDevBtn('btn-cDC','cNC',al.length);const b=document.getElementById('btn-cDC');if(b){b.textContent='-- なし --';b.classList.add('ph');}}
+  cUPD();
+}
+function cONc(){cC=devFromK(document.getElementById('cDC').value);chip('cDCch',cC?devChip(cC):null);cUPD();}
+function cUPD(){
+  const P=document.getElementById('cRes');if(!cGC){P.classList.remove('on');return;}P.classList.add('on');
+  const gcId=cGC.id,Rg=gcId/2,devs=[cA,cB,cC].filter(Boolean),radii=devs.map(d=>d.od/2);
+  const Re=radii.length?mEnc(radii):0,enD=Re*2,mg=gcId-enD;
+  const Ag=Math.PI*Rg*Rg,Ad=radii.reduce((s,r)=>s+Math.PI*r*r,0),fl=radii.length?(Ad/Ag*100):0;
+  const vEl=document.getElementById('cVD');
+  if(!radii.length){vEl.className='vb vok';vEl.textContent='GC のみ';}
+  else if(mg>=0.15){vEl.className='vb vok';vEl.textContent='Clearance OK';}
+  else if(mg>=0.01){vEl.className='vb vwn';vEl.textContent='Friction Risk';}
+  else{vEl.className='vb vng';vEl.textContent='Clearance 不足';}
+  document.getElementById('cGI').textContent=gcId.toFixed(3)+' mm';
+  document.getElementById('cEN').textContent=radii.length?enD.toFixed(3)+' mm':'--';
+  const mEl=document.getElementById('cMG');
+  if(radii.length){mEl.textContent=(mg>=0?'+':'')+mg.toFixed(3)+'mm';mEl.style.color=mg>=0.15?'#4fffb0':mg>=0.01?'#ff9f1c':'#ff4d6d';}
+  else{mEl.textContent='--';mEl.style.color='#00d4ff';}
+  document.getElementById('cFL').textContent=radii.length?fl.toFixed(1)+'%':'--';
+  let dt='<tr><td class="dk">GC I.D.</td><td class="dv">'+(gcId/25.4).toFixed(4)+'in / '+gcId.toFixed(3)+'mm</td></tr>';
+  ['A','B','C'].forEach((lb,i)=>{const d=[cA,cB,cC][i];if(d)dt+='<tr><td class="dk">Device '+lb+'</td><td class="dv">'+(d.od/.333).toFixed(1)+'Fr / '+d.od.toFixed(3)+'mm</td></tr>';});
+  if(radii.length>1)dt+='<tr><td class="dk">包絡円径</td><td class="dv">'+enD.toFixed(3)+'mm</td></tr>';
+  document.getElementById('cDT').innerHTML=dt;drawCV('cCV',Rg,radii,mg);
+  const cb=document.getElementById('cCTB');if(devs.length){cb.classList.add('on');cvBox('cCVB','cCTL',cGC,devs);}else cb.classList.remove('on');
+}
+function cRST(){
+  cGC=cA=cB=cC=null;document.getElementById('cGC').value='';
+  ['cDA','cDB','cDC'].forEach(id=>document.getElementById(id).innerHTML='<option value="" disabled selected></option>');
+  ['cGCch','cDAch','cDBch','cDCch'].forEach(id=>chip(id,null));
+  ['cNA','cNB','cNC'].forEach(id=>document.getElementById(id).style.display='none');
+  ['btn-cDA','btn-cDB','btn-cDC'].forEach(id=>{const b=document.getElementById(id);if(b){b.style.display='none';b.textContent='-- なし --';b.classList.add('ph');}});
+  ['cCA','cCB','cCC'].forEach(id=>document.getElementById(id).textContent='0');
+  const bg=document.getElementById('btn-cGC');if(bg){bg.textContent='-- 外管を選択 --';bg.classList.add('ph');}
+  ['cs2','cs3','cs4'].forEach(id=>lck(id,true));
+  document.getElementById('cRes').classList.remove('on');document.getElementById('cCTB').classList.remove('on');
+}
+
+/* FINDER */
+let fA=null,fB=null,fC=null;
+function fONa(){
+  fA=devFromK(document.getElementById('fDA').value);fB=fC=null;
+  chip('fDAch',fA?devChip(fA):null);chip('fDBch',null);chip('fDCch',null);lck('fs2',!fA);
+  if(fA){const dl=devListForTx();document.getElementById('fDB').innerHTML=devSelHTML(dl);document.getElementById('fCB').textContent=dl.length;const b=document.getElementById('btn-fDB');if(b){b.textContent='-- なし --';b.classList.add('ph');}}
+  document.getElementById('fDB').value='';document.getElementById('fDC').innerHTML='<option value="" disabled selected></option>';
+  document.getElementById('fCC').textContent='0';chip('fDCch',null);
+  const b=document.getElementById('btn-fDC');if(b){b.textContent='-- なし --';b.classList.add('ph');}
+  lck('fs3',true);fUPD();
+}
+function fONb(){
+  fB=devFromK(document.getElementById('fDB').value);fC=null;chip('fDBch',fB?devChip(fB):null);chip('fDCch',null);lck('fs3',!fA);
+  if(fA){const dl=devListForTx();document.getElementById('fDC').innerHTML=devSelHTML(dl);document.getElementById('fCC').textContent=dl.length;const b=document.getElementById('btn-fDC');if(b){b.textContent='-- なし --';b.classList.add('ph');}}
+  document.getElementById('fDC').value='';fUPD();
+}
+function fONc(){fC=devFromK(document.getElementById('fDC').value);chip('fDCch',fC?devChip(fC):null);fUPD();}
+function fUPD(){
+  const lEl=document.getElementById('fList'),devs=[fA,fB,fC].filter(Boolean);
+  if(!devs.length){lEl.innerHTML='<p style="font-family:monospace;font-size:.68rem;color:#5a7a9a">Device Aを選択すると候補が表示されます</p>';document.getElementById('fViz').style.display='none';return;}
+  const radii=devs.map(d=>d.od/2),Re=mEnc(radii);
+  const cds=Object.entries(GC_DB).filter(([k,d])=>(d.id/2)>=Re+0.005).sort((a,b)=>a[1].id-b[1].id);
+  if(!cds.length){lEl.innerHTML='<div style="font-family:monospace;font-size:.7rem;color:#ff4d6d;padding:10px;border:1px dashed rgba(255,77,109,.3);border-radius:4px">収容可能なGC/BGC/Sheathが見つかりません</div>';document.getElementById('fViz').style.display='none';return;}
+  let h='<div style="display:flex;flex-direction:column;gap:5px;margin-bottom:14px">';
+  cds.forEach(([k,d])=>{
+    const mg=d.id-Re*2,pct=((Re/(d.id/2))*100).toFixed(1),mc=mg>=0.15?'#4fffb0':mg>=0.01?'#ff9f1c':'#ff4d6d',tc=TYPE_COL[d.type]||'#00d4ff';
+    h+='<div class="gc-cand" data-k="'+k+'" onclick="fSelGC(\''+k+'\')" style="padding:10px 12px;background:#192030;border:1px solid #1e2d3d;border-radius:6px;cursor:pointer;">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;gap:6px">'
+      +'<div style="min-width:0;flex:1"><div style="font-family:monospace;font-size:.69rem;color:#e2eaf5;word-break:break-word">'+d.name+'</div>'
+      +'<div style="margin-top:3px;display:flex;align-items:center;gap:5px;flex-wrap:wrap"><span style="font-size:.57rem;padding:1px 5px;border-radius:3px;background:'+tc+'20;color:'+tc+'">'+d.type+'</span>'+(d.verified?'<span style="font-size:.57rem;color:#4fffb0">confirmed</span>':'')+'</div></div>'
+      +'<div style="text-align:right;flex-shrink:0;padding-left:8px"><div style="font-family:monospace;font-size:.65rem;color:#5a7a9a">'+d.id.toFixed(3)+'mm</div><div style="font-family:monospace;font-size:.65rem;color:'+mc+'">CL: '+(mg>=0?'+':'')+mg.toFixed(3)+'mm</div><div style="font-family:monospace;font-size:.62rem;color:#5a7a9a">'+pct+'%</div></div>'
+      +'</div></div>';
+  });
+  h+='</div>';lEl.innerHTML=h;fSelGC(cds[0][0]);
+}
+function fSelGC(k){
+  document.querySelectorAll('.gc-cand').forEach(el=>{el.style.borderColor=el.dataset.k===k?'#00d4ff':'#1e2d3d';el.style.background=el.dataset.k===k?'#1a3050':'#192030';});
+  const d=GC_DB[k];if(!d)return;
+  const devs=[fA,fB,fC].filter(Boolean),radii=devs.map(x=>x.od/2),mg=d.id-mEnc(radii)*2;
+  document.getElementById('fViz').style.display='block';
+  document.getElementById('fVizT').textContent=d.name+' — '+d.id.toFixed(3)+'mm';
+  const vc=mg>=0.15?'#4fffb0':mg>=0.01?'#ff9f1c':'#ff4d6d';
+  document.getElementById('fVD').textContent=mg>=0.15?'✓ Clearance OK':mg>=0.01?'△ Friction Risk':'✗ 挿入不可';
+  document.getElementById('fVD').style.color=vc;
+  document.getElementById('fInfo').innerHTML='<span style="color:#5a7a9a;font-size:.6rem">I.D. </span><span style="color:#00d4ff;font-size:.85rem;font-weight:700">'+d.id.toFixed(3)+'mm</span>&nbsp;&nbsp;<span style="color:#5a7a9a;font-size:.6rem">CL </span><span style="color:'+vc+';font-size:.82rem;font-weight:700">'+(mg>=0?'+':'')+mg.toFixed(3)+'mm</span>'+(d.src?'<div style="margin-top:6px;color:'+srcC(d.src)+';font-size:.6rem">'+d.src+'</div>':'');
+  drawCV('fCV',d.id/2,radii,mg);
+}
+function fRST(){
+  fA=fB=fC=null;document.getElementById('fDA').value='';
+  ['fDB','fDC'].forEach(id=>document.getElementById(id).innerHTML='<option value="" disabled selected></option>');
+  ['fDAch','fDBch','fDCch'].forEach(id=>chip(id,null));
+  ['fCA','fCB','fCC'].forEach(id=>document.getElementById(id).textContent='0');
+  ['fs2','fs3'].forEach(id=>lck(id,true));
+  document.getElementById('fList').innerHTML='<p style="font-family:monospace;font-size:.68rem;color:#5a7a9a">Device Aを選択すると候補が表示されます</p>';
+  document.getElementById('fViz').style.display='none';
+  const dl=devListForTx();document.getElementById('fDA').innerHTML=devSelHTML(dl);document.getElementById('fCA').textContent=dl.length;
+  ['btn-fDA','btn-fDB','btn-fDC'].forEach(id=>{const b=document.getElementById(id);if(b){b.textContent=id==='btn-fDA'?'-- 選択 --':'-- なし --';b.classList.add('ph');}});
+}
+
+/* CONTRAST */
+let xGC=null,xA=null,xB=null,xC=null;
+function xONgc(){
+  const k=document.getElementById('xGC').value;if(!k){xGC=null;chip('xGCch',null);lck('xts2',true);xUPD();return;}
+  xGC=gcFromK(k);xA=xB=xC=null;chip('xGCch',xGC?gcChip(xGC):null);lck('xts2',!xGC);
+  if(xGC){const R=xGC.id/2,dl=devListForTx().filter(d=>d.od/2<R);document.getElementById('xDA').innerHTML=devSelHTML(dl);showDevBtn('btn-xDA','xNA',dl.length);document.getElementById('xCA').textContent=dl.length;const b=document.getElementById('btn-xDA');if(b){b.textContent='-- なし --';b.classList.add('ph');}}
+  ['xDB','xDC'].forEach(id=>document.getElementById(id).innerHTML='<option value="" disabled selected></option>');
+  ['btn-xDB','btn-xDC'].forEach(id=>{const b=document.getElementById(id);if(b){b.style.display='none';b.textContent='-- なし --';b.classList.add('ph');}});
+  ['xNB','xNC'].forEach(id=>document.getElementById(id).style.display='none');
+  ['xCB','xCC'].forEach(id=>document.getElementById(id).textContent='0');
+  ['xDAch','xDBch','xDCch'].forEach(id=>chip(id,null));
+  lck('xts3',true);lck('xts4',true);xUPD();
+}
+function xONa(){
+  xA=devFromK(document.getElementById('xDA').value);xB=xC=null;chip('xDAch',xA?devChip(xA):null);chip('xDBch',null);chip('xDCch',null);lck('xts3',!xGC);
+  if(xGC){const R=xGC.id/2,dl=devListForTx(),rA=xA?xA.od/2:0;const al=xA?dl.filter(d=>{const rB=d.od/2;return rA+rB<=R&&fits([rA,rB],R);}):dl.filter(d=>d.od/2<=R-0.005);document.getElementById('xDB').innerHTML=devSelHTML(al);document.getElementById('xCB').textContent=al.length;showDevBtn('btn-xDB','xNB',al.length);const b=document.getElementById('btn-xDB');if(b){b.textContent='-- なし --';b.classList.add('ph');}}
+  document.getElementById('xDC').innerHTML='<option value="" disabled selected></option>';document.getElementById('xCC').textContent='0';chip('xDCch',null);
+  const b=document.getElementById('btn-xDC');if(b){b.style.display='none';b.textContent='-- なし --';b.classList.add('ph');}
+  lck('xts4',true);xUPD();
+}
+function xONb(){
+  xB=devFromK(document.getElementById('xDB').value);xC=null;chip('xDBch',xB?devChip(xB):null);chip('xDCch',null);lck('xts4',!xGC);
+  if(xGC){const R=xGC.id/2,existing=[xA,xB].filter(Boolean).map(d=>d.od/2),dl=devListForTx();const al=existing.length?dl.filter(d=>fits([...existing,d.od/2],R)):dl.filter(d=>d.od/2<=R-0.005);document.getElementById('xDC').innerHTML=devSelHTML(al);document.getElementById('xCC').textContent=al.length;showDevBtn('btn-xDC','xNC',al.length);const b=document.getElementById('btn-xDC');if(b){b.textContent='-- なし --';b.classList.add('ph');}}
+  xUPD();
+}
+function xONc(){xC=devFromK(document.getElementById('xDC').value);chip('xDCch',xC?devChip(xC):null);xUPD();}
+function xUPD(){
+  const P=document.getElementById('xRes');if(!xGC){P.classList.remove('on');return;}P.classList.add('on');
+  const gcId=xGC.id,Rg=gcId/2,devs=[xA,xB,xC].filter(Boolean),radii=devs.map(d=>d.od/2);
+  const Re=radii.length?mEnc(radii):0,enD=Re*2,cl=gcId-enD;
+  const Ag=Math.PI*Rg*Rg,Ad=radii.reduce((s,r)=>s+Math.PI*r*r,0),fl=radii.length?(Ad/Ag*100):0;
+  const j=cjudge(cl),ci=cl/25.4;
+  cvBox('xCVB','xCTL',xGC,devs);
+  document.getElementById('xGI').textContent=gcId.toFixed(3)+' mm';
+  document.getElementById('xEN').textContent=radii.length?enD.toFixed(3)+' mm':'-- (none)';
+  const mEl=document.getElementById('xMG');mEl.textContent=(cl>=0?'+':'')+cl.toFixed(3)+'mm / '+(ci>=0?'+':'')+ci.toFixed(4)+'in';mEl.style.color=j.vc;
+  document.getElementById('xFL').textContent=radii.length?fl.toFixed(1)+'%':'--';
+  drawCV('xCV',Rg,radii,cl);
+}
+function xRST(){
+  xGC=xA=xB=xC=null;document.getElementById('xGC').value='';
+  ['xDA','xDB','xDC'].forEach(id=>document.getElementById(id).innerHTML='<option value="" disabled selected></option>');
+  ['xGCch','xDAch','xDBch','xDCch'].forEach(id=>chip(id,null));
+  ['xNA','xNB','xNC'].forEach(id=>document.getElementById(id).style.display='none');
+  ['btn-xDA','btn-xDB','btn-xDC'].forEach(id=>{const b=document.getElementById(id);if(b){b.style.display='none';b.textContent='-- なし --';b.classList.add('ph');}});
+  ['xCA','xCB','xCC'].forEach(id=>document.getElementById(id).textContent='0');
+  const bg=document.getElementById('btn-xGC');if(bg){bg.textContent='-- 外管を選択 --';bg.classList.add('ph');}
+  ['xts2','xts3','xts4'].forEach(id=>lck(id,true));
+  document.getElementById('xRes').classList.remove('on');
+}
+
+/* DEVICE CRUD */
+let _ek=null,_dk=null;
+function openMod(k){_ek=k||null;const d=k?DEV_DB[k]:null;document.getElementById('modTtl').textContent=d?'EDIT':'NEW DEVICE';document.getElementById('dN').value=d?d.name:'';document.getElementById('dC').value=d?d.cat:'DAC';document.getElementById('dO').value=d?d.od:'';document.getElementById('dT').value=d?d.type:'proximal';document.getElementById('dNo').value=d?(d.note||''):'';document.getElementById('dS').value=d?(d.src||''):'';document.getElementById('dDt').value=d?(d.dt||''):'';document.getElementById('modDev').style.display='block';}
+function closeMod(){document.getElementById('modDev').style.display='none';}
+function saveMod(){const nm=document.getElementById('dN').value.trim(),od=parseFloat(document.getElementById('dO').value);if(!nm||isNaN(od)||od<=0){alert('製品名と外径を入力してください');return;}const k=_ek||('c_'+Date.now());DEV_DB[k]={name:nm,od,type:document.getElementById('dT').value,cat:document.getElementById('dC').value,note:document.getElementById('dNo').value.trim(),src:document.getElementById('dS').value.trim()||'unconfirmed',dt:document.getElementById('dDt').value||new Date().toISOString().slice(0,7)};closeMod();renderSpecs();}
+function openDel(k){_dk=k;document.getElementById('delNm').textContent=DEV_DB[k]?.name||k;document.getElementById('modDel').style.display='block';}
+function execDel(){if(_dk&&DEV_DB[_dk])delete DEV_DB[_dk];document.getElementById('modDel').style.display='none';renderSpecs();}
+
+/* SPECS */
+function renderSpecs(){
+  const cont=document.getElementById('spAll');cont.innerHTML='';let h='';
+  ['BGC','GC','Guiding Sheath'].forEach(tp=>{
+    const items=Object.entries(GC_DB).filter(([k,d])=>d.type===tp).sort((a,b)=>b[1].id-a[1].id);if(!items.length)return;
+    h+='<div><div class="scat">'+tp+'</div><div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table class="stbl"><thead><tr><th>製品名</th><th>Fr</th><th>I.D.(in)</th><th>I.D.(mm)</th><th>確認</th><th>src</th></tr></thead><tbody>';
+    items.forEach(([k,d])=>h+='<tr><td>'+d.name+'</td><td>'+d.fr+'</td><td>'+d.id_in.toFixed(4)+'</td><td>'+d.id.toFixed(3)+'</td><td class="'+(d.verified?'tok':'twn')+'">'+(d.verified?'ok':'?')+'</td><td><span style="color:'+srcC(d.src||'')+';font-size:.56rem">'+(d.src||'--')+'</span></td></tr>');
+    h+='</tbody></table></div></div>';
+  });
+  const fs=Object.entries(GC_DB).filter(([k,d])=>d.type==='Flexor Shuttle').sort((a,b)=>b[1].id-a[1].id);
+  h+='<div><div class="scat" style="color:#2dd4bf">Flexor Shuttle/Ansel (Cook)</div><div style="overflow-x:auto"><table class="stbl"><thead><tr><th>製品名</th><th>Fr</th><th>I.D.(in)</th><th>I.D.(mm)</th><th>src</th></tr></thead><tbody>';
+  fs.forEach(([k,d])=>h+='<tr><td style="color:#2dd4bf">'+d.name+'</td><td>'+d.fr+'</td><td>'+d.id_in.toFixed(4)+'</td><td>'+d.id.toFixed(3)+'</td><td><span style="color:'+srcC(d.src||'')+';font-size:.56rem">'+(d.src||'--')+'</span></td></tr>');
+  h+='</tbody></table></div></div>';
+  CAT_ORDER.forEach(cat=>{
+    const entries=Object.entries(DEV_DB).filter(([k,d])=>d.cat===cat).sort((a,b)=>(b[1].od||0)-(a[1].od||0));if(!entries.length)return;
+    h+='<div><div class="scat">'+cat+'</div><div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table class="stbl"><thead><tr><th>製品名</th><th>O.D.</th><th>種別</th><th>src</th><th></th></tr></thead><tbody>';
+    entries.forEach(([k,d])=>h+='<tr><td>'+d.name+'<span class="sl2 tmu">'+(d.note||'')+'</span></td><td>'+(d.od/.333).toFixed(1)+'Fr</td><td class="'+(d.type==='proximal'?'tok':'twn')+'">'+(d.type==='proximal'?'prox':'distal')+'</td><td><span style="color:'+srcC(d.src||'')+';font-size:.56rem">'+(d.src||'--')+'</span></td><td style="white-space:nowrap"><button data-ek="'+k+'" style="background:none;border:none;cursor:pointer;color:#00d4ff;font-size:1rem;padding:6px 7px;min-height:38px">E</button><button data-dk="'+k+'" style="background:none;border:none;cursor:pointer;color:#e05555;font-size:1rem;padding:6px 7px;min-height:38px">X</button></td></tr>');
+    h+='</tbody></table></div></div>';
+  });
+  cont.innerHTML=h;
+  let gw='<div style="margin-top:12px"><div class="scat">GW</div><div style="overflow-x:auto"><table class="stbl"><thead><tr><th>製品名</th><th>O.D.(mm)</th><th>src</th></tr></thead><tbody>';
+  Object.entries(GW_DB).forEach(([k,d])=>gw+='<tr><td>'+d.name+'</td><td>'+d.od.toFixed(3)+'</td><td><span style="color:'+srcC(d.src||'')+';font-size:.56rem">'+(d.src||'--')+'</span></td></tr>');
+  gw+='</tbody></table></div></div>';document.getElementById('spGW').innerHTML=gw;
+  cont.onclick=e=>{const eb=e.target.closest('[data-ek]'),db=e.target.closest('[data-dk]');if(eb)openMod(eb.dataset.ek);if(db)openDel(db.dataset.dk);};
+}
+</script>
+
+</body>
+</html>
