@@ -1,5 +1,5 @@
-/* Matching Catheter Pro service worker — nologo build */
-const CACHE_NAME = "mcp-nologo-v570";
+/* Matching Catheter Pro service worker — icon text build */
+const CACHE_NAME = "mcp-icontext-v580";
 const CORE_ASSETS = [
   "./",
   "./index.html",
@@ -9,7 +9,8 @@ const CORE_ASSETS = [
   "./icon-512.png",
   "./favicon-16.png",
   "./favicon-32.png",
-  "./favicon.ico"
+  "./favicon.ico",
+  "./icon-master-1024.png"
 ];
 
 self.addEventListener("install", event => {
